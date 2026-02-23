@@ -1,12 +1,10 @@
-/// <summary> Description
-/// UC3 is designed to overcome the Disadvantage of using Feet and Inches which starts violating the DRY principle, 
-/// where both Feet and Inches classes contain nearly identical code, having the same constructor pattern, 
-/// Identical equals() method implementation.
-/// This Use Case refactors the existing Feet and Inches classes into a single generic Quantity Length class-
-///  that eliminates code duplication while maintaining all functionality from UC1 and UC2.
-/// The Quantity Length class represents any measurement with a value and unit type, 
-/// applying the DRY (Don't Repeat Yourself) principle. This reduces maintenance burden and makes-
-///  the codebase more scalable for adding new units in the future.
+/// <summary> 
+/// Description
+/// UC4 extends UC3 by introducing Yards and Centimeters as additional length units 
+/// to the QuantityLength class. This use case demonstrates how the generic 
+/// Quantity class design scales effortlessly to accommodate new units without code duplication. 
+/// Yards will be added to the LengthUnit enum with the appropriate conversion factor (1 yard = 3 feet) 
+/// and (1cm = 0.393701in), and all equality comparisons will work seamlessly across feet, inches, yards, and cms.
 /// </summary>
 
 using System.Runtime.CompilerServices;
@@ -37,11 +35,48 @@ using QuantityMeasurementApp.Core.Enums;
 
         }
 
-        // convertion method
-         private double ConvertToBaseUnit()
+    // convertion method
+     // Converts value to base unit (feet)
+
+     /// <summary>
+     /// internal working of below method in modern csharp 
+     /// private double ConvertToBaseUnit()
+    // {
+    //     if (_unit == LengthUnit.Feet)
+    //     {
+    //         return _value;
+    //     }
+    //     else if (_unit == LengthUnit.Inch)
+    //     {
+    //         return _value / 12.0;
+    //     }
+    //     else if (_unit == LengthUnit.Yard)
+    //     {
+    //         return _value * 3.0;
+    //     }
+    //     else if (_unit == LengthUnit.Centimeter)
+    //     {
+    //         return _value / 30.48;
+    //     }
+    //     else
+    //     {
+    //         throw new ArgumentException("Invalid unit");
+    //     }
+    // }
+     /// </summary>
+     /// <returns></returns>
+     /// <exception cref="ArgumentException"></exception>
+        private double ConvertToBaseUnit()
         {
-            return _value / (double)_unit;
-        }
+            return _unit switch
+        {
+            LengthUnit.Feet => _value,
+            LengthUnit.Inch => _value / 12.0,
+            LengthUnit.Yard => _value * 3.0,
+            LengthUnit.Centimeter => _value / 30.48,
+            _ => throw new ArgumentException($"Invalid unit: {_unit}")
+        };
+    }
 
         // Compares this QuantityLength with another object for equality.
 
@@ -59,7 +94,7 @@ using QuantityMeasurementApp.Core.Enums;
 
             QuantityLength other = (QuantityLength)obj;
 
-             return ConvertToBaseUnit().CompareTo(other.ConvertToBaseUnit()) == 0;
+             return Math.Abs(ConvertToBaseUnit() - other.ConvertToBaseUnit()) < 0.0001;
         }
 
         // It Returns hash code based on value and unit.
