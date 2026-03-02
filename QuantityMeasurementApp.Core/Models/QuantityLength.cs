@@ -35,86 +35,39 @@ namespace QuantityMeasurementApp.Core.Models
             _unit = unit;
         }
 
-        private double ConvertToBaseUnit()
+       private double ConvertToBaseUnit()
         {
-            if (_unit == LengthUnit.Feet)
-            {
-                return _value;
-            }
-            else if (_unit == LengthUnit.Inch)
-            {
-                return _value / 12.0;
-            }
-            else if (_unit == LengthUnit.Yard)
-            {
-                return _value * 3.0;
-            }
-            else if (_unit == LengthUnit.Centimeter)
-            {
-                return _value / 30.48;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid unit: {_unit}");
-            }
+            // Delegate to LengthUnit extension method — Single Responsibility Principle
+            return _unit.ConvertToBaseUnit(_value);
         }
 
         
-        public QuantityLength ConvertTo(LengthUnit targetUnit)
+       public QuantityLength ConvertTo(LengthUnit targetUnit)
         {
             if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
-            {
-                throw new ArgumentException($"Invalid target unit: {targetUnit}");
-            }
+            throw new ArgumentException($"Invalid target unit: {targetUnit}");
 
-            double baseValue = ConvertToBaseUnit();
-            double convertedValue;
+            // Step 1 — Convert to base unit using LengthUnit extension method
+            double baseValue = _unit.ConvertToBaseUnit(_value);
 
-            if (targetUnit == LengthUnit.Feet)
-            {
-                convertedValue = baseValue;
-            }
-            else if (targetUnit == LengthUnit.Inch)
-            {
-                convertedValue = baseValue * 12.0;
-            }
-            else if (targetUnit == LengthUnit.Yard)
-            {
-                convertedValue = baseValue / 3.0;
-            }
-            else if (targetUnit == LengthUnit.Centimeter)
-            {
-                convertedValue = baseValue * 30.48;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid target unit: {targetUnit}");
-            }
+            // Step 2 — Convert from base unit to target unit
+            double convertedValue = targetUnit.ConvertFromBaseUnit(baseValue);
 
-            // Round to 2 decimal places for consistent precision
             return new QuantityLength(Math.Round(convertedValue, 2), targetUnit);
         }
 
+
         // Private helper — used by both Add methods (DRY)
         private QuantityLength AddInTargetUnit(QuantityLength other, LengthUnit targetUnit)
-        {
-            double sum = ConvertToBaseUnit() + other.ConvertToBaseUnit();
-            double result;
+{
+    // Convert both to base unit using LengthUnit extension method
+    double sum = _unit.ConvertToBaseUnit(_value) + other._unit.ConvertToBaseUnit(other._value);
 
-            if (targetUnit == LengthUnit.Feet)
-                result = sum;
-            else if (targetUnit == LengthUnit.Inch)
-                result = sum * 12.0;
-            else if (targetUnit == LengthUnit.Yard)
-                result = sum / 3.0;
-            else if (targetUnit == LengthUnit.Centimeter)
-                result = sum * 30.48;
-            else
-                throw new ArgumentException($"Invalid unit: {targetUnit}");
+    // Convert sum to target unit
+    double result = targetUnit.ConvertFromBaseUnit(sum);
 
-            return new QuantityLength(Math.Round(result, 2), targetUnit);
-        }
-
+    return new QuantityLength(Math.Round(result, 2), targetUnit);
+}
         // UC6 — result in unit of first operand
         public QuantityLength Add(QuantityLength other)
         {
@@ -126,8 +79,10 @@ namespace QuantityMeasurementApp.Core.Models
         public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
+
             if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
                 throw new ArgumentException($"Invalid unit: {targetUnit}");
+                
             return AddInTargetUnit(other, targetUnit);
         }
 
