@@ -151,8 +151,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenYardValue_WhenUnitIsInvalid_ShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() =>
-                new QuantityLength(1.0, (LengthUnit)999));
+            Assert.Throws<ArgumentNullException>(() =>
+                    new QuantityLength(1.0, null));
         }
 
         /// <summary>
@@ -187,8 +187,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenCentimeterValue_WhenUnitIsInvalid_ShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() =>
-                new QuantityLength(1.0, (LengthUnit)999));
+            Assert.Throws<ArgumentNullException>(() =>
+                    new QuantityLength(1.0, null));
         }
 
         /// <summary>

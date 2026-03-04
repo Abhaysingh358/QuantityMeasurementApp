@@ -203,8 +203,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenInvalidUnit_WhenCreatingQuantity_ShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() =>
-                new QuantityLength(1.0, (LengthUnit)999));
+            Assert.Throws<ArgumentNullException>(() =>
+                new QuantityLength(1.0, null));
         }
 
         /// <summary>

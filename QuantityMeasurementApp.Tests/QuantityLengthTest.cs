@@ -107,8 +107,8 @@ namespace QuantityMeasurementApp.Test
         [TestMethod]
         public void GivenQuantityLength_WhenUnitIsNull_ShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() =>
-                new QuantityLength(1.0, (LengthUnit)999));
+            Assert.Throws<ArgumentNullException>(() =>
+                    new QuantityLength(1.0, null));
         }
 
         // Test 9: Same reference should be equal (reflexive)

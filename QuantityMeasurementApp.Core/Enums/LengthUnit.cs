@@ -1,77 +1,70 @@
-namespace QuantityMeasurementApp.Core.Enums;
-// Supported Length units
-public enum LengthUnit
-{
-     Feet,
-    Inch,
-    Yard,
-    Centimeter
-}
+using QuantityMeasurementApp.Core.Interfaces;
 
-      /// <summary>
-    /// Extension class for LengthUnit enum.
-    /// Responsible for unit conversion logic — Single Responsibility Principle.
-    /// LengthUnit now owns conversion responsibility instead of QuantityLength.
+namespace QuantityMeasurementApp.Core.Enums
+{
+    /// <summary>
+    /// Represents a length unit with conversion responsibility.
+    /// Implements IMeasurable interface — Single Responsibility Principle.
     /// Base unit is Feet.
+    /// UC10 — Wrapper class pattern replaces enum to allow interface implementation.
     /// </summary>
-    
-    public static class LengthUnitExtensions
+    public class LengthUnit : IMeasurable
     {
-        public static double ConvertToBaseUnit(this LengthUnit unit, double value)
+        // Conversion factor relative to base unit (feet)
+        private readonly double _conversionFactor;
+        private readonly string _unitName;
+
+        // Private constructor — only static instances allowed
+        private LengthUnit(double conversionFactor, string unitName)
         {
-            if (unit == LengthUnit.Feet)
-            {
-                // Feet is base unit — no conversion needed
-                return value;
-            }
-            else if (unit == LengthUnit.Inch)
-            {
-                // 12 inches = 1 foot, so divide by 12
-                return value / 12.0;
-            }
-            else if (unit == LengthUnit.Yard)
-            {
-                // 1 yard = 3 feet, so multiply by 3
-                return value * 3.0;
-            }
-            else if (unit == LengthUnit.Centimeter)
-            {
-                // 30.48 cm = 1 foot, so divide by 30.48
-                return value / 30.48;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid unit: {unit}");
-            }
+            _conversionFactor = conversionFactor;
+            _unitName = unitName;
         }
 
-        public static double ConvertFromBaseUnit(this LengthUnit unit, double baseValue)
+        // Static instances — replaces enum constants
+        // Feet = 1.0 (base unit)
+        public static readonly LengthUnit Feet = new LengthUnit(1.0, "Feet");
+        // Inch = 1/12 (1 inch = 1/12 foot)
+        public static readonly LengthUnit Inch = new LengthUnit(1.0 / 12.0, "Inch");
+        // Yard = 3.0 (1 yard = 3 feet)
+        public static readonly LengthUnit Yard = new LengthUnit(3.0, "Yard");
+        // Centimeter = 1/30.48 (1 cm = 1/30.48 foot)
+        public static readonly LengthUnit Centimeter = new LengthUnit(1.0 / 30.48, "Centimeter");
+
+        /// <summary>
+        /// Converts a value in this unit to base unit (feet).
+        /// Formula: value * conversionFactor
+        /// </summary>
+        public double ConvertToBaseUnit(double value)
         {
-            if (unit == LengthUnit.Feet)
-            {
-                // Feet is base unit — no conversion needed
-                return baseValue;
-            }
-            else if (unit == LengthUnit.Inch)
-            {
-                // 1 foot = 12 inches, so multiply by 12
-                return baseValue * 12.0;
-            }
-            else if (unit == LengthUnit.Yard)
-            {
-                // 3 feet = 1 yard, so divide by 3
-                return baseValue / 3.0;
-            }
-            else if (unit == LengthUnit.Centimeter)
-            {
-                // 1 foot = 30.48 cm, so multiply by 30.48
-                return baseValue * 30.48;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid unit: {unit}");
-            }
+            // Multiply by conversion factor to get feet
+            return value * _conversionFactor;
+        }
+
+        /// <summary>
+        /// Converts a value from base unit (feet) to this unit.
+        /// Formula: baseValue / conversionFactor
+        /// </summary>
+        public double ConvertFromBaseUnit(double baseValue)
+        {
+            // Divide by conversion factor to get this unit
+            return baseValue / _conversionFactor;
+        }
+
+        /// <summary>
+        /// Returns readable name of this unit.
+        /// </summary>
+        public string GetUnitName()
+        {
+            return _unitName;
+        }
+
+        /// <summary>
+        /// Returns string representation.
+        /// </summary>
+        public override string ToString()
+        {
+            return _unitName;
         }
     }
-
-
+}

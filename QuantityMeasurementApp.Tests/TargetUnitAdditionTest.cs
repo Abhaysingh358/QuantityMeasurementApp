@@ -145,7 +145,7 @@ namespace QuantityMeasurementApp.Tests
             QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Feet);
             QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
             Assert.Throws<ArgumentException>(() =>
-                firstValue.Add(secondValue, (LengthUnit)999));
+                firstValue.Add(secondValue, null));
         }
 
         /// <summary>

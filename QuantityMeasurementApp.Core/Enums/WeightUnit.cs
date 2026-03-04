@@ -1,73 +1,68 @@
+using QuantityMeasurementApp.Core.Interfaces;
+
 namespace QuantityMeasurementApp.Core.Enums
 {
-    // Supported Weight units
-    public enum WeightUnit
-    {
-        Kilogram,
-        Gram,
-        Pound
-    }
-
     /// <summary>
-    /// Extension class for WeightUnit enum.
-    /// Responsible for unit conversion logic — Single Responsibility Principle.
+    /// Represents a weight unit with conversion responsibility.
+    /// Implements IMeasurable interface — Single Responsibility Principle.
     /// Base unit is Kilogram.
-    /// Kilogram  = 1.0
-    /// Gram   =  0.001 (1g = 0.001 kg)
-    /// Pound  =  0.453592 (1lb = 0.453592 kg)
+    /// UC10 — Wrapper class pattern replaces enum to allow interface implementation.
     /// </summary>
-    public static class WeightUnitExtensions
+    public class WeightUnit : IMeasurable
     {
+        // Conversion factor relative to base unit (kilogram)
+        private readonly double _conversionFactor;
+        private readonly string _unitName;
+
+        // Private constructor — only static instances allowed
+        private WeightUnit(double conversionFactor, string unitName)
+        {
+            _conversionFactor = conversionFactor;
+            _unitName = unitName;
+        }
+
+        // Static instances — replaces enum constants
+        // Kilogram = 1.0 (base unit)
+        public static readonly WeightUnit Kilogram = new WeightUnit(1.0, "Kilogram");
+        // Gram = 0.001 (1 gram = 0.001 kilogram)
+        public static readonly WeightUnit Gram = new WeightUnit(0.001, "Gram");
+        // Pound = 0.453592 (1 pound = 0.453592 kilogram)
+        public static readonly WeightUnit Pound = new WeightUnit(0.453592, "Pound");
+
         /// <summary>
         /// Converts a value in this unit to base unit (kilogram).
+        /// Formula: value * conversionFactor
         /// </summary>
-        public static double ConvertToBaseUnit(this WeightUnit unit, double value)
+        public double ConvertToBaseUnit(double value)
         {
-            if (unit == WeightUnit.Kilogram)
-            {
-                // Kilogram is base unit — no conversion needed
-                return value;
-            }
-            else if (unit == WeightUnit.Gram)
-            {
-                // 1000 grams = 1 kilogram, so divide by 1000
-                return value / 1000.0;
-            }
-            else if (unit == WeightUnit.Pound)
-            {
-                // 1 pound = 0.453592 kilograms
-                return value * 0.453592;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid unit: {unit}");
-            }
+            // Multiply by conversion factor to get kilograms
+            return value * _conversionFactor;
         }
 
         /// <summary>
         /// Converts a value from base unit (kilogram) to this unit.
+        /// Formula: baseValue / conversionFactor
         /// </summary>
-        public static double ConvertFromBaseUnit(this WeightUnit unit, double baseValue)
+        public double ConvertFromBaseUnit(double baseValue)
         {
-            if (unit == WeightUnit.Kilogram)
-            {
-                // Kilogram is base unit — no conversion needed
-                return baseValue;
-            }
-            else if (unit == WeightUnit.Gram)
-            {
-                // 1 kilogram = 1000 grams, so multiply by 1000
-                return baseValue * 1000.0;
-            }
-            else if (unit == WeightUnit.Pound)
-            {
-                // 1 kilogram = 2.20462 pounds
-                return baseValue / 0.453592;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid unit: {unit}");
-            }
+            // Divide by conversion factor to get this unit
+            return baseValue / _conversionFactor;
+        }
+
+        /// <summary>
+        /// Returns readable name of this unit.
+        /// </summary>
+        public string GetUnitName()
+        {
+            return _unitName;
+        }
+
+        /// <summary>
+        /// Returns string representation.
+        /// </summary>
+        public override string ToString()
+        {
+            return _unitName;
         }
     }
 }

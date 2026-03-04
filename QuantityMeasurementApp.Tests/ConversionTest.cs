@@ -136,7 +136,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.Throws<ArgumentException>(() =>
             {
                 QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-                feetValue.ConvertTo((LengthUnit)999);
+                feetValue.ConvertTo(null);
             });
         }
 

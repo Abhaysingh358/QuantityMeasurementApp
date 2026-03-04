@@ -100,8 +100,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenInvalidUnit_WhenCreatingWeight_ShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() =>
-                new QuantityWeight(1.0, (WeightUnit)999));
+           Assert.Throws<ArgumentNullException>(() =>
+                new QuantityWeight(1.0, null));
         }
 
         /// <summary>
