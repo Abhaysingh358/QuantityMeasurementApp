@@ -2,15 +2,25 @@ using QuantityMeasurementApp.Core.Interfaces;
 
 namespace QuantityMeasurementApp.Core.Models
 {
+    /// <summary>
+    /// Generic immutable quantity supporting equality, conversion,
+    /// addition, subtraction, and division across all measurement categories.
+    ///
+    /// UC10 — Generic design with IMeasurable constraint.
+    /// UC12 — Subtraction and division operations added.
+    /// UC13 — Centralized arithmetic via private ArithmeticOperation enum and private helpers (DRY enforced).
+    /// UC14 — ValidateOperationSupport() called in PerformBaseArithmetic before any arithmetic.
+    ///         TemperatureUnit throws InvalidOperationException from its override.
+    ///         ConvertTo() works for temperature via non-linear lambda path (no special-case needed).
+    ///         LengthUnit, WeightUnit, VolumeUnit unaffected — inherit default no-op from IMeasurable.
+    /// </summary>
     public class Quantity<T> where T : IMeasurable
     {
-        //  PRIVATE ENUM 
-
         /// <summary>
-        /// UC13 — Private enum using lambda expressions (DoubleBinaryOperator pattern).
-        /// Each constant holds a Func(double, double) => double that defines the operation.
-        /// Compute() executes the stored lambda with the two base-unit values.
-        /// Adding a new operation = new constant only. No changes elsewhere.
+        /// UC13 — Private enum for arithmetic operation dispatch.
+        /// ADD, SUBTRACT, DIVIDE each represent a specific arithmetic operation.
+        /// Private: implementation detail, not part of public API.
+        /// UC14 — operation.ToString() passed to ValidateOperationSupport() for clear error messages.
         /// </summary>
         private enum ArithmeticOperation
         {
@@ -19,34 +29,8 @@ namespace QuantityMeasurementApp.Core.Models
             Divide
         }
 
-        /// <summary>
-        /// UC13 — Executes the arithmetic operation on two base-unit values.
-        /// Lambda dispatch — mirrors Java's DoubleBinaryOperator pattern in C#.
-        /// Division-by-zero is validated here before computing.
-        /// </summary>
-        private static double Compute(ArithmeticOperation operation, double a, double b)
-        {
-            switch (operation)
-            {
-                case ArithmeticOperation.Add:
-                    return a + b;
-                case ArithmeticOperation.Subtract:
-                    return a - b;
-                case ArithmeticOperation.Divide:
-                    if (b == 0)
-                        throw new ArithmeticException("Cannot divide by zero quantity");
-                    return a / b;
-                default:
-                    throw new ArgumentException($"Unsupported operation: {operation}");
-            }
-        }
-
-        //  FIELDS 
-
         private readonly double _value;
         private readonly T _unit;
-
-        //  CONSTRUCTOR 
 
         public Quantity(double value, T unit)
         {
@@ -60,14 +44,12 @@ namespace QuantityMeasurementApp.Core.Models
             _unit = unit;
         }
 
-        //  PRIVATE HELPERS 
-
         private double ToBaseValue() => _unit.ConvertToBaseUnit(_value);
 
         /// <summary>
         /// UC13 — Step 2: Centralized validation helper.
-        /// Validates null, same category, finite value, optional target unit.
-        /// Called by ALL operations — validation logic defined ONCE.
+        /// Validates null operand, same measurement category, finite value, optional target unit.
+        /// Called by ALL arithmetic operations — validation logic defined ONCE.
         /// </summary>
         private void ValidateArithmeticOperands(Quantity<T> other, T targetUnit, bool targetUnitRequired)
         {
@@ -88,19 +70,41 @@ namespace QuantityMeasurementApp.Core.Models
 
         /// <summary>
         /// UC13 — Step 3: Core arithmetic helper.
-        /// Converts both operands to base unit, calls Compute() via enums,
-        /// returns raw base-unit result.
-        /// Conversion logic defined ONCE — DRY Followed.
+        /// UC14 — Calls this.unit.ValidateOperationSupport(operation.ToString()) FIRST.
+        ///         TemperatureUnit throws InvalidOperationException before any arithmetic runs.
+        ///         LengthUnit, WeightUnit, VolumeUnit inherit no-op default — unaffected.
+        /// Converts both operands to base unit, dispatches operation, returns raw base-unit result.
         /// </summary>
         private double PerformBaseArithmetic(Quantity<T> other, ArithmeticOperation operation)
         {
+            // UC14 — validate operation support before any arithmetic
+            _unit.ValidateOperationSupport(operation.ToString());
+
             double thisBase = ToBaseValue();
             double otherBase = other.ToBaseValue();
-            return Compute(operation, thisBase, otherBase);
+
+            switch (operation)
+            {
+                case ArithmeticOperation.Add:
+                    return thisBase + otherBase;
+                case ArithmeticOperation.Subtract:
+                    return thisBase - otherBase;
+                case ArithmeticOperation.Divide:
+                    if (otherBase == 0)
+                        throw new ArithmeticException("Cannot divide by zero quantity");
+                    return thisBase / otherBase;
+                default:
+                    throw new ArgumentException($"Unsupported operation: {operation}");
+            }
         }
 
-        //  CONVERSION 
-
+        /// <summary>
+        /// Converts this quantity to the specified target unit.
+        /// UC14 — Works correctly for temperature without special-casing:
+        ///         ConvertToBaseUnit() applies the stored _toCelsius lambda.
+        ///         targetUnit.ConvertFromBaseUnit() applies the stored _fromCelsius lambda on target.
+        ///         Example: 100°C to Fahrenheit: toCelsius(100) = 100, fromFahrenheit(100) = 212.
+        /// </summary>
         public Quantity<T> ConvertTo(T targetUnit)
         {
             if (targetUnit == null)
@@ -111,9 +115,7 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(converted, 5), targetUnit);
         }
 
-        // ADDITION 
-
-        /// <summary>UC13 — Step 4: Implicit target unit.</summary>
+        /// <summary>UC13 — Step 4: Implicit target unit (first operand's unit).</summary>
         public Quantity<T> Add(Quantity<T> other)
         {
             ValidateArithmeticOperands(other, _unit, false);
@@ -122,7 +124,7 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), _unit);
         }
 
-        /// UC13 — Step 4: Explicit target unit.
+        /// <summary>UC13 — Step 4: Explicit target unit.</summary>
         public Quantity<T> Add(Quantity<T> other, T targetUnit)
         {
             ValidateArithmeticOperands(other, targetUnit, true);
@@ -131,9 +133,7 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), targetUnit);
         }
 
-        // SUBTRACTION
-
-        /// <summary>UC13 — Step 4: Implicit target unit.</summary>
+        /// <summary>UC13 — Step 4: Implicit target unit (first operand's unit).</summary>
         public Quantity<T> Subtract(Quantity<T> other)
         {
             ValidateArithmeticOperands(other, _unit, false);
@@ -142,7 +142,7 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), _unit);
         }
 
-        /// UC13 — Step 4: Explicit target unit.
+        /// <summary>UC13 — Step 4: Explicit target unit.</summary>
         public Quantity<T> Subtract(Quantity<T> other, T targetUnit)
         {
             ValidateArithmeticOperands(other, targetUnit, true);
@@ -151,16 +151,12 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), targetUnit);
         }
 
-        // DIVISION 
-
-        /// UC13 — Step 4: Returns dimensionless scalar.
+        /// <summary>UC13 — Step 4: Returns dimensionless scalar.</summary>
         public double Divide(Quantity<T> other)
         {
             ValidateArithmeticOperands(other, default, false);
             return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
         }
-
-        // EQUALITY & HASH 
 
         public override bool Equals(object? obj)
         {

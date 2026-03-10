@@ -25,5 +25,11 @@ namespace QuantityMeasurementApp.Core.Interfaces
         /// Example: "Feet", "Kilogram"
         /// </summary>
         string GetUnitName();
+
+        // Default: all units support arithmetic. TemperatureUnit overrides this to return false.
+        bool SupportsArithmetic() => true;
+
+        // Default: does nothing. TemperatureUnit overrides this to throw an exception.
+        void ValidateOperationSupport(string operation) { }
     }
 }
