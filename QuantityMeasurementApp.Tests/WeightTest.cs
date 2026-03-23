@@ -1,5 +1,8 @@
-using QuantityMeasurementApp.Core.Enums;
-using QuantityMeasurementApp.Core.Models;
+using QuantityMeasurementApp.Models.Enums;
+using QuantityMeasurementApp.Models.Interfaces;
+using QuantityMeasurementApp.Models.Exceptions;
+using QuantityMeasurementApp.Business.Helpers;
+using QuantityMeasurementApp.Business.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
@@ -18,8 +21,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoKilogramValues_WhenBothAreEqual_ShouldReturnTrue()
         {
-            QuantityWeight first = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight second = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> first = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> second = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
             Assert.AreEqual(first, second);
         }
 
@@ -30,8 +33,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoKilogramValues_WhenBothAreDifferent_ShouldReturnFalse()
         {
-            QuantityWeight first = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight second = new QuantityWeight(2.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> first = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> second = new Quantity<WeightUnit>(2.0, WeightUnit.Kilogram);
             Assert.IsFalse(first.Equals(second));
         }
 
@@ -42,8 +45,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneKilogramAndThousandGrams_WhenCompared_ShouldReturnTrue()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
             Assert.AreEqual(kgValue, gValue);
         }
 
@@ -54,8 +57,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenThousandGramsAndOneKilogram_WhenCompared_ShouldReturnTrue()
         {
-            QuantityWeight gValue = new QuantityWeight(1000.0, WeightUnit.Gram);
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
             Assert.AreEqual(gValue, kgValue);
         }
 
@@ -66,8 +69,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramAndFeet_WhenCompared_ShouldReturnFalse()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
             Assert.IsFalse(kgValue.Equals(feetValue));
         }
 
@@ -78,7 +81,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramValue_WhenComparedWithNull_ShouldReturnFalse()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
             Assert.IsFalse(kgValue.Equals(null));
         }
 
@@ -89,7 +92,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramValue_WhenComparedWithSameReference_ShouldReturnTrue()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
             Assert.AreEqual(kgValue, kgValue);
         }
 
@@ -101,7 +104,7 @@ namespace QuantityMeasurementApp.Tests
         public void GivenInvalidUnit_WhenCreatingWeight_ShouldThrowException()
         {
            Assert.Throws<ArgumentNullException>(() =>
-                new QuantityWeight(1.0, null));
+                new Quantity<WeightUnit>(1.0, null));
         }
 
         /// <summary>
@@ -111,9 +114,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramGramKilogram_WhenTransitiveCheck_ShouldReturnTrue()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(1000.0, WeightUnit.Gram);
-            QuantityWeight kgValue2 = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue2 = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
             Assert.AreEqual(kgValue, gValue);
             Assert.AreEqual(gValue, kgValue2);
             Assert.AreEqual(kgValue, kgValue2);
@@ -126,8 +129,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenZeroKilogramAndZeroGram_WhenCompared_ShouldReturnTrue()
         {
-            QuantityWeight kgValue = new QuantityWeight(0.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(0.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(0.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(0.0, WeightUnit.Gram);
             Assert.AreEqual(kgValue, gValue);
         }
 
@@ -138,8 +141,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenNegativeKilogramAndNegativeGram_WhenCompared_ShouldReturnTrue()
         {
-            QuantityWeight kgValue = new QuantityWeight(-1.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(-1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(-1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(-1000.0, WeightUnit.Gram);
             Assert.AreEqual(kgValue, gValue);
         }
 
@@ -150,8 +153,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenLargeGramAndKilogram_WhenCompared_ShouldReturnTrue()
         {
-            QuantityWeight gValue = new QuantityWeight(1000000.0, WeightUnit.Gram);
-            QuantityWeight kgValue = new QuantityWeight(1000.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Kilogram);
             Assert.AreEqual(gValue, kgValue);
         }
 
@@ -162,8 +165,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenSmallKilogramAndOneGram_WhenCompared_ShouldReturnTrue()
         {
-            QuantityWeight kgValue = new QuantityWeight(0.001, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(1.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(0.001, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1.0, WeightUnit.Gram);
             Assert.AreEqual(kgValue, gValue);
         }
 
@@ -174,9 +177,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoPointTwoPounds_WhenConvertedToKilogram_ShouldReturnOne()
         {
-            QuantityWeight poundValue = new QuantityWeight(2.20462, WeightUnit.Pound);
-            QuantityWeight result = poundValue.ConvertTo(WeightUnit.Kilogram);
-            QuantityWeight expected = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> poundValue = new Quantity<WeightUnit>(2.20462, WeightUnit.Pound);
+            Quantity<WeightUnit> result = poundValue.ConvertTo(WeightUnit.Kilogram);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
 
@@ -187,9 +190,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneKilogram_WhenConvertedToPound_ShouldReturnTwoPointTwo()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight result = kgValue.ConvertTo(WeightUnit.Pound);
-            QuantityWeight expected = new QuantityWeight(2.20462, WeightUnit.Pound);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = kgValue.ConvertTo(WeightUnit.Pound);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(2.20462, WeightUnit.Pound);
             Assert.AreEqual(expected, result);
         }
 
@@ -200,9 +203,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFiveKilogram_WhenConvertedToSameUnit_ShouldReturnFive()
         {
-            QuantityWeight kgValue = new QuantityWeight(5.0, WeightUnit.Kilogram);
-            QuantityWeight result = kgValue.ConvertTo(WeightUnit.Kilogram);
-            QuantityWeight expected = new QuantityWeight(5.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = kgValue.ConvertTo(WeightUnit.Kilogram);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
 
@@ -213,9 +216,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenZeroKilogram_WhenConvertedToGram_ShouldReturnZero()
         {
-            QuantityWeight kgValue = new QuantityWeight(0.0, WeightUnit.Kilogram);
-            QuantityWeight result = kgValue.ConvertTo(WeightUnit.Gram);
-            QuantityWeight expected = new QuantityWeight(0.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(0.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = kgValue.ConvertTo(WeightUnit.Gram);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(0.0, WeightUnit.Gram);
             Assert.AreEqual(expected, result);
         }
 
@@ -226,9 +229,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenNegativeOneKilogram_WhenConvertedToGram_ShouldReturnNegativeThousand()
         {
-            QuantityWeight kgValue = new QuantityWeight(-1.0, WeightUnit.Kilogram);
-            QuantityWeight result = kgValue.ConvertTo(WeightUnit.Gram);
-            QuantityWeight expected = new QuantityWeight(-1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(-1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = kgValue.ConvertTo(WeightUnit.Gram);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(-1000.0, WeightUnit.Gram);
             Assert.AreEqual(expected, result);
         }
 
@@ -239,9 +242,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramValue_WhenRoundTripConversion_ShouldReturnOriginalValue()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.5, WeightUnit.Kilogram);
-            QuantityWeight converted = kgValue.ConvertTo(WeightUnit.Gram);
-            QuantityWeight roundTrip = converted.ConvertTo(WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.5, WeightUnit.Kilogram);
+            Quantity<WeightUnit> converted = kgValue.ConvertTo(WeightUnit.Gram);
+            Quantity<WeightUnit> roundTrip = converted.ConvertTo(WeightUnit.Kilogram);
             Assert.AreEqual(kgValue, roundTrip);
         }
 
@@ -252,10 +255,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneKilogramAndTwoKilogram_WhenAdded_ShouldReturnThreeKilogram()
         {
-            QuantityWeight first = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight second = new QuantityWeight(2.0, WeightUnit.Kilogram);
-            QuantityWeight result = first.Add(second);
-            QuantityWeight expected = new QuantityWeight(3.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> first = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> second = new Quantity<WeightUnit>(2.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = first.Add(second);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(3.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
 
@@ -266,10 +269,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneKilogramAndThousandGrams_WhenAdded_ShouldReturnTwoKilogram()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(1000.0, WeightUnit.Gram);
-            QuantityWeight result = kgValue.Add(gValue);
-            QuantityWeight expected = new QuantityWeight(2.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> result = kgValue.Add(gValue);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(2.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
 
@@ -280,10 +283,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenPoundAndKilogram_WhenAdded_ShouldReturnCorrectPounds()
         {
-            QuantityWeight poundValue = new QuantityWeight(2.20462, WeightUnit.Pound);
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight result = poundValue.Add(kgValue);
-            QuantityWeight expected = new QuantityWeight(4.40924, WeightUnit.Pound);
+            Quantity<WeightUnit> poundValue = new Quantity<WeightUnit>(2.20462, WeightUnit.Pound);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = poundValue.Add(kgValue);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(4.40924, WeightUnit.Pound);
             Assert.AreEqual(expected, result);
         }
 
@@ -294,10 +297,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramAndGram_WhenAddedWithGramTarget_ShouldReturnTwoThousandGrams()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(1000.0, WeightUnit.Gram);
-            QuantityWeight result = kgValue.Add(gValue, WeightUnit.Gram);
-            QuantityWeight expected = new QuantityWeight(2000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> result = kgValue.Add(gValue, WeightUnit.Gram);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(2000.0, WeightUnit.Gram);
             Assert.AreEqual(expected, result);
         }
 
@@ -308,10 +311,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenKilogramAndGram_WhenAddedBothWays_ShouldBeCommutative()
         {
-            QuantityWeight kgValue = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(1000.0, WeightUnit.Gram);
-            QuantityWeight result1 = kgValue.Add(gValue, WeightUnit.Kilogram);
-            QuantityWeight result2 = gValue.Add(kgValue, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> result1 = kgValue.Add(gValue, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result2 = gValue.Add(kgValue, WeightUnit.Kilogram);
             Assert.AreEqual(result1, result2);
         }
 
@@ -322,10 +325,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFiveKilogramAndZeroGram_WhenAdded_ShouldReturnFiveKilogram()
         {
-            QuantityWeight kgValue = new QuantityWeight(5.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(0.0, WeightUnit.Gram);
-            QuantityWeight result = kgValue.Add(gValue);
-            QuantityWeight expected = new QuantityWeight(5.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(0.0, WeightUnit.Gram);
+            Quantity<WeightUnit> result = kgValue.Add(gValue);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
 
@@ -336,10 +339,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFiveKilogramAndNegativeTwoThousandGrams_WhenAdded_ShouldReturnThreeKilogram()
         {
-            QuantityWeight kgValue = new QuantityWeight(5.0, WeightUnit.Kilogram);
-            QuantityWeight gValue = new QuantityWeight(-2000.0, WeightUnit.Gram);
-            QuantityWeight result = kgValue.Add(gValue);
-            QuantityWeight expected = new QuantityWeight(3.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> kgValue = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> gValue = new Quantity<WeightUnit>(-2000.0, WeightUnit.Gram);
+            Quantity<WeightUnit> result = kgValue.Add(gValue);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(3.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
 
@@ -350,10 +353,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenLargeKilogramValues_WhenAdded_ShouldReturnCorrectSum()
         {
-            QuantityWeight first = new QuantityWeight(1000000.0, WeightUnit.Kilogram);
-            QuantityWeight second = new QuantityWeight(1000000.0, WeightUnit.Kilogram);
-            QuantityWeight result = first.Add(second);
-            QuantityWeight expected = new QuantityWeight(2000000.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> first = new Quantity<WeightUnit>(1000000.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> second = new Quantity<WeightUnit>(1000000.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> result = first.Add(second);
+            Quantity<WeightUnit> expected = new Quantity<WeightUnit>(2000000.0, WeightUnit.Kilogram);
             Assert.AreEqual(expected, result);
         }
     }

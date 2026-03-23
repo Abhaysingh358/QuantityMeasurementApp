@@ -1,5 +1,8 @@
-using QuantityMeasurementApp.Core.Enums;
-using QuantityMeasurementApp.Core.Models;
+using QuantityMeasurementApp.Models.Enums;
+using QuantityMeasurementApp.Models.Interfaces;
+using QuantityMeasurementApp.Models.Exceptions;
+using QuantityMeasurementApp.Business.Helpers;
+using QuantityMeasurementApp.Business.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
@@ -16,10 +19,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetAndInches_WhenAddedWithFeetTarget_ShouldReturnTwoFeet()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Feet);
-            QuantityLength expected = new QuantityLength(2.0, LengthUnit.Feet);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Feet);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
             Assert.AreEqual(expected, result);
         }
 
@@ -30,10 +33,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetAndInches_WhenAddedWithInchesTarget_ShouldReturnTwentyFourInches()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Inch);
-            QuantityLength expected = new QuantityLength(24.0, LengthUnit.Inch);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Inch);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(24.0, LengthUnit.Inch);
             Assert.AreEqual(expected, result);
         }
 
@@ -44,10 +47,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetAndInches_WhenAddedWithYardsTarget_ShouldReturnCorrectYards()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Yard);
-            QuantityLength expected = new QuantityLength(0.67, LengthUnit.Yard);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Yard);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(0.67, LengthUnit.Yard);
             Assert.AreEqual(expected, result);
         }
 
@@ -58,10 +61,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoInches_WhenAddedWithCentimetersTarget_ShouldReturnFivePointZeroEightCentimeters()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Inch);
-            QuantityLength secondValue = new QuantityLength(1.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Centimeter);
-            QuantityLength expected = new QuantityLength(5.08, LengthUnit.Centimeter);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Inch);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(1.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Centimeter);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(5.08, LengthUnit.Centimeter);
             Assert.AreEqual(expected, result);
         }
 
@@ -72,10 +75,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenYardsAndFeet_WhenAddedWithYardsTarget_ShouldReturnThreeYards()
         {
-            QuantityLength firstValue = new QuantityLength(2.0, LengthUnit.Yard);
-            QuantityLength secondValue = new QuantityLength(3.0, LengthUnit.Feet);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Yard);
-            QuantityLength expected = new QuantityLength(3.0, LengthUnit.Yard);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(2.0, LengthUnit.Yard);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(3.0, LengthUnit.Feet);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Yard);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(3.0, LengthUnit.Yard);
             Assert.AreEqual(expected, result);
         }
 
@@ -86,10 +89,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenYardsAndFeet_WhenAddedWithFeetTarget_ShouldReturnNineFeet()
         {
-            QuantityLength firstValue = new QuantityLength(2.0, LengthUnit.Yard);
-            QuantityLength secondValue = new QuantityLength(3.0, LengthUnit.Feet);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Feet);
-            QuantityLength expected = new QuantityLength(9.0, LengthUnit.Feet);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(2.0, LengthUnit.Yard);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(3.0, LengthUnit.Feet);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Feet);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(9.0, LengthUnit.Feet);
             Assert.AreEqual(expected, result);
         }
 
@@ -100,10 +103,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetAndInches_WhenAddedBothWaysWithYardsTarget_ShouldBeCommutative()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result1 = feetValue.Add(inchValue, LengthUnit.Yard);
-            QuantityLength result2 = inchValue.Add(feetValue, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result1 = feetValue.Add(inchValue, LengthUnit.Yard);
+            Quantity<LengthUnit> result2 = inchValue.Add(feetValue, LengthUnit.Yard);
             Assert.AreEqual(result1, result2);
         }
 
@@ -114,10 +117,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFiveFeetAndZeroInches_WhenAddedWithYardsTarget_ShouldReturnCorrectYards()
         {
-            QuantityLength firstValue = new QuantityLength(5.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(0.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Yard);
-            QuantityLength expected = new QuantityLength(1.67, LengthUnit.Yard);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(0.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Yard);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(1.67, LengthUnit.Yard);
             Assert.AreEqual(expected, result);
         }
 
@@ -128,10 +131,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFiveFeetAndNegativeTwoFeet_WhenAddedWithInchesTarget_ShouldReturnThirtySixInches()
         {
-            QuantityLength firstValue = new QuantityLength(5.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(-2.0, LengthUnit.Feet);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Inch);
-            QuantityLength expected = new QuantityLength(36.0, LengthUnit.Inch);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(-2.0, LengthUnit.Feet);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Inch);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(36.0, LengthUnit.Inch);
             Assert.AreEqual(expected, result);
         }
 
@@ -142,8 +145,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetAndInches_WhenTargetUnitIsInvalid_ShouldThrowException()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
             Assert.Throws<ArgumentException>(() =>
                 firstValue.Add(secondValue, null));
         }
@@ -155,10 +158,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenLargeFeetValues_WhenAddedWithInchesTarget_ShouldReturnCorrectInches()
         {
-            QuantityLength firstValue = new QuantityLength(1000.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(500.0, LengthUnit.Feet);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Inch);
-            QuantityLength expected = new QuantityLength(18000.0, LengthUnit.Inch);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1000.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(500.0, LengthUnit.Feet);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Inch);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(18000.0, LengthUnit.Inch);
             Assert.AreEqual(expected, result);
         }
 
@@ -169,10 +172,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwelveInchesAndTwelveInches_WhenAddedWithYardsTarget_ShouldReturnCorrectYards()
         {
-            QuantityLength firstValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Yard);
-            QuantityLength expected = new QuantityLength(0.67, LengthUnit.Yard);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Yard);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(0.67, LengthUnit.Yard);
             Assert.AreEqual(expected, result);
         }
 
@@ -184,19 +187,19 @@ namespace QuantityMeasurementApp.Tests
         public void GivenAllUnitCombinations_WhenAdded_ShouldReturnCorrectResults()
         {
             // Feet + Inches → Yards
-            QuantityLength result1 = new QuantityLength(3.0, LengthUnit.Feet)
-                .Add(new QuantityLength(36.0, LengthUnit.Inch), LengthUnit.Yard);
-            Assert.AreEqual(new QuantityLength(2.0, LengthUnit.Yard), result1);
+            Quantity<LengthUnit> result1 = new Quantity<LengthUnit>(3.0, LengthUnit.Feet)
+                .Add(new Quantity<LengthUnit>(36.0, LengthUnit.Inch), LengthUnit.Yard);
+            Assert.AreEqual(new Quantity<LengthUnit>(2.0, LengthUnit.Yard), result1);
 
             // Yards + Feet → Inches
-            QuantityLength result2 = new QuantityLength(1.0, LengthUnit.Yard)
-                .Add(new QuantityLength(3.0, LengthUnit.Feet), LengthUnit.Inch);
-            Assert.AreEqual(new QuantityLength(72.0, LengthUnit.Inch), result2);
+            Quantity<LengthUnit> result2 = new Quantity<LengthUnit>(1.0, LengthUnit.Yard)
+                .Add(new Quantity<LengthUnit>(3.0, LengthUnit.Feet), LengthUnit.Inch);
+            Assert.AreEqual(new Quantity<LengthUnit>(72.0, LengthUnit.Inch), result2);
 
             // Centimeters + Inches → Feet
-            QuantityLength result3 = new QuantityLength(30.48, LengthUnit.Centimeter)
-                .Add(new QuantityLength(12.0, LengthUnit.Inch), LengthUnit.Feet);
-            Assert.AreEqual(new QuantityLength(2.0, LengthUnit.Feet), result3);
+            Quantity<LengthUnit> result3 = new Quantity<LengthUnit>(30.48, LengthUnit.Centimeter)
+                .Add(new Quantity<LengthUnit>(12.0, LengthUnit.Inch), LengthUnit.Feet);
+            Assert.AreEqual(new Quantity<LengthUnit>(2.0, LengthUnit.Feet), result3);
         }
 
         /// <summary>
@@ -206,10 +209,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenCentimeterAndInch_WhenAddedWithFeetTarget_ShouldBeWithinEpsilon()
         {
-            QuantityLength firstValue = new QuantityLength(30.48, LengthUnit.Centimeter);
-            QuantityLength secondValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = firstValue.Add(secondValue, LengthUnit.Feet);
-            QuantityLength expected = new QuantityLength(2.0, LengthUnit.Feet);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(30.48, LengthUnit.Centimeter);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = firstValue.Add(secondValue, LengthUnit.Feet);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
             Assert.AreEqual(expected, result);
         }
     }

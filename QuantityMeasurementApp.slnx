@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="QuantityMeasurementApp.Core/QuantityMeasurementApp.Core.csproj" />
+  <Project Path="QuantityMeasurementApp.Application/QuantityMeasurementApp.Application.csproj" />
+  <Project Path="QuantityMeasurementApp.Business/QuantityMeasurementApp.Business.csproj" />
+  <Project Path="QuantityMeasurementApp.Models/QuantityMeasurementApp.Models.csproj" />
   <Project Path="QuantityMeasurementApp.Tests/QuantityMeasurementApp.Tests.csproj" />
 </Solution>

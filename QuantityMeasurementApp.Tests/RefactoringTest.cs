@@ -1,5 +1,8 @@
-using QuantityMeasurementApp.Core.Enums;
-using QuantityMeasurementApp.Core.Models;
+using QuantityMeasurementApp.Models.Enums;
+using QuantityMeasurementApp.Models.Interfaces;
+using QuantityMeasurementApp.Models.Exceptions;
+using QuantityMeasurementApp.Business.Helpers;
+using QuantityMeasurementApp.Business.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
@@ -144,78 +147,78 @@ namespace QuantityMeasurementApp.Tests
         }
 
         /// <summary>
-        /// testQuantityLengthRefactored_Equality() –
+        /// testQuantity<LengthUnit>Refactored_Equality() –
         /// Verifies Quantity(1.0, FEET).equals(Quantity(12.0, INCHES)) returns true.
         /// </summary>
         [TestMethod]
         public void GivenOneFeetAndTwelveInches_WhenCompared_ShouldReturnTrue()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
             Assert.AreEqual(feetValue, inchValue);
         }
 
         /// <summary>
-        /// testQuantityLengthRefactored_ConvertTo() –
+        /// testQuantity<LengthUnit>Refactored_ConvertTo() –
         /// Verifies Quantity(1.0, FEET).ConvertTo(INCHES) returns Quantity(12.0, INCHES).
         /// </summary>
         [TestMethod]
         public void GivenOneFeet_WhenConvertToInches_ShouldReturnTwelveInches()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength result = feetValue.ConvertTo(LengthUnit.Inch);
-            QuantityLength expected = new QuantityLength(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> result = feetValue.ConvertTo(LengthUnit.Inch);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
             Assert.AreEqual(expected, result);
         }
 
         /// <summary>
-        /// testQuantityLengthRefactored_Add() –
+        /// testQuantity<LengthUnit>Refactored_Add() –
         /// Verifies Quantity(1.0, FEET).Add(Quantity(12.0, INCHES)) returns Quantity(2.0, FEET).
         /// </summary>
         [TestMethod]
         public void GivenOneFeetAndTwelveInches_WhenAdded_ShouldReturnTwoFeet()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = feetValue.Add(inchValue);
-            QuantityLength expected = new QuantityLength(2.0, LengthUnit.Feet);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = feetValue.Add(inchValue);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
             Assert.AreEqual(expected, result);
         }
 
         /// <summary>
-        /// testQuantityLengthRefactored_AddWithTargetUnit() –
+        /// testQuantity<LengthUnit>Refactored_AddWithTargetUnit() –
         /// Verifies Quantity(1.0, FEET).Add(Quantity(12.0, INCHES), YARDS) returns ~0.67 YARDS.
         /// </summary>
         [TestMethod]
         public void GivenOneFeetAndTwelveInches_WhenAddedWithYardsTarget_ShouldReturnCorrectYards()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = feetValue.Add(inchValue, LengthUnit.Yard);
-            QuantityLength expected = new QuantityLength(0.67, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = feetValue.Add(inchValue, LengthUnit.Yard);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(0.67, LengthUnit.Yard);
             Assert.AreEqual(expected, result);
         }
 
         /// <summary>
-        /// testQuantityLengthRefactored_NullUnit() –
+        /// testQuantity<LengthUnit>Refactored_NullUnit() –
         /// Verifies Quantity(1.0, invalid unit) throws ArgumentException.
         /// </summary>
         [TestMethod]
         public void GivenInvalidUnit_WhenCreatingQuantity_ShouldThrowException()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                new QuantityLength(1.0, null));
+                new Quantity<LengthUnit>(1.0, null));
         }
 
         /// <summary>
-        /// testQuantityLengthRefactored_InvalidValue() –
+        /// testQuantity<LengthUnit>Refactored_InvalidValue() –
         /// Verifies Quantity(NaN, FEET) throws ArgumentException.
         /// </summary>
         [TestMethod]
         public void GivenNaNValue_WhenCreatingQuantity_ShouldThrowException()
         {
             Assert.Throws<ArgumentException>(() =>
-                new QuantityLength(double.NaN, LengthUnit.Feet));
+                new Quantity<LengthUnit>(double.NaN, LengthUnit.Feet));
         }
 
         /// <summary>
@@ -225,8 +228,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoFeetValues_WhenBothAreEqual_ShouldReturnTrue()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength secondValue = new QuantityLength(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
             Assert.AreEqual(firstValue, secondValue);
         }
 
@@ -237,9 +240,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneYard_WhenConvertedToInches_ShouldReturnThirtySix()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength result = yardValue.ConvertTo(LengthUnit.Inch);
-            QuantityLength expected = new QuantityLength(36.0, LengthUnit.Inch);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> result = yardValue.ConvertTo(LengthUnit.Inch);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(36.0, LengthUnit.Inch);
             Assert.AreEqual(expected, result);
         }
 
@@ -250,10 +253,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneFeetAndTwelveInches_WhenAdded_ShouldReturnTwoFeetUC6()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = feetValue.Add(inchValue);
-            QuantityLength expected = new QuantityLength(2.0, LengthUnit.Feet);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = feetValue.Add(inchValue);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
             Assert.AreEqual(expected, result);
         }
 
@@ -264,10 +267,10 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetAndInches_WhenAddedWithInchesTarget_ShouldReturnTwentyFourInches()
         {
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(12.0, LengthUnit.Inch);
-            QuantityLength result = feetValue.Add(inchValue, LengthUnit.Inch);
-            QuantityLength expected = new QuantityLength(24.0, LengthUnit.Inch);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            Quantity<LengthUnit> result = feetValue.Add(inchValue, LengthUnit.Inch);
+            Quantity<LengthUnit> expected = new Quantity<LengthUnit>(24.0, LengthUnit.Inch);
             Assert.AreEqual(expected, result);
         }
 
@@ -276,9 +279,9 @@ namespace QuantityMeasurementApp.Tests
         /// Confirms refactored pattern supports multiple categories without coupling.
         /// </summary>
         [TestMethod]
-        public void GivenLengthUnit_WhenCheckedForIndependence_ShouldNotDependOnQuantityLength()
+        public void GivenLengthUnit_WhenCheckedForIndependence_ShouldNotDependOnQuantity()
         {
-            // LengthUnit extension methods work independently of QuantityLength
+            // LengthUnit extension methods work independently of Quantity<LengthUnit>
             double feetResult = LengthUnit.Feet.ConvertToBaseUnit(1.0);
             double inchResult = LengthUnit.Inch.ConvertToBaseUnit(12.0);
             double yardResult = LengthUnit.Yard.ConvertToBaseUnit(1.0);
@@ -297,9 +300,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenFeetValue_WhenRoundTripConversion_ShouldPreserveOriginalValue()
         {
-            QuantityLength original = new QuantityLength(5.0, LengthUnit.Feet);
-            QuantityLength converted = original.ConvertTo(LengthUnit.Inch);
-            QuantityLength roundTrip = converted.ConvertTo(LengthUnit.Feet);
+            Quantity<LengthUnit> original = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            Quantity<LengthUnit> converted = original.ConvertTo(LengthUnit.Inch);
+            Quantity<LengthUnit> roundTrip = converted.ConvertTo(LengthUnit.Feet);
             Assert.AreEqual(original, roundTrip);
         }
 

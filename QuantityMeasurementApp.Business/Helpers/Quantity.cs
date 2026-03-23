@@ -1,27 +1,30 @@
-using QuantityMeasurementApp.Core.Interfaces;
+using QuantityMeasurementApp.Models.Interfaces;
 
-namespace QuantityMeasurementApp.Core.Models
+namespace QuantityMeasurementApp.Business.Helpers
 {
-    /// <summary>
-    /// Generic immutable quantity supporting equality, conversion,
-    /// addition, subtraction, and division across all measurement categories.
-    ///
-    /// UC10 — Generic design with IMeasurable constraint.
-    /// UC12 — Subtraction and division operations added.
-    /// UC13 — Centralized arithmetic via private ArithmeticOperation enum and private helpers (DRY enforced).
-    /// UC14 — ValidateOperationSupport() called in PerformBaseArithmetic before any arithmetic.
-    ///         TemperatureUnit throws InvalidOperationException from its override.
-    ///         ConvertTo() works for temperature via non-linear lambda path (no special-case needed).
-    ///         LengthUnit, WeightUnit, VolumeUnit unaffected — inherit default no-op from IMeasurable.
-    /// </summary>
-    public class Quantity<T> where T : IMeasurable
+    // UC10 - made this class generic so one class can handle all unit types
+    // Quantity<LengthUnit>, Quantity<WeightUnit> etc all work with same code
+    // the where T : IMeasurable constraint means T must implement IMeasurable
+    // so only our unit classes can be used here, nothing random
+
+    // UC12 - added Subtract and Divide operations here
+
+    // UC13 - refactored Add, Subtract, Divide to remove code duplication
+    // earlier each method had its own validation and arithmetic logic
+    // now i have ValidateArithmeticOperands() and PerformBaseArithmetic() as private helpers
+    // all three operations call these helpers — DRY principle
+
+    // UC14 - added ValidateOperationSupport() call inside PerformBaseArithmetic
+    // this is how temperature blocks arithmetic — it throws from its override
+
+    // UC15 - moved this class from Core project to Business/Helpers
+    // it's marked internal so it's only visible inside Business project
+    // outside world only sees QuantityDTO — not this class
+    internal class Quantity<T> where T : IMeasurable
     {
-        /// <summary>
-        /// UC13 — Private enum for arithmetic operation dispatch.
-        /// ADD, SUBTRACT, DIVIDE each represent a specific arithmetic operation.
-        /// Private: implementation detail, not part of public API.
-        /// UC14 — operation.ToString() passed to ValidateOperationSupport() for clear error messages.
-        /// </summary>
+        // UC13 - private enum to represent which operation to perform
+        // pass this to PerformBaseArithmetic instead of duplicating the switch logic
+        // UC14 - operation.ToString() is passed to ValidateOperationSupport for the error message
         private enum ArithmeticOperation
         {
             Add,
@@ -32,7 +35,7 @@ namespace QuantityMeasurementApp.Core.Models
         private readonly double _value;
         private readonly T _unit;
 
-        public Quantity(double value, T unit)
+        internal Quantity(double value, T unit)
         {
             if (unit == null)
                 throw new ArgumentNullException(nameof(unit), "Unit cannot be null");
@@ -44,18 +47,18 @@ namespace QuantityMeasurementApp.Core.Models
             _unit = unit;
         }
 
+        // converts this quantity's value to the base unit
+        // example: 12 Inch -> 1 Feet
         private double ToBaseValue() => _unit.ConvertToBaseUnit(_value);
 
-        /// <summary>
-        /// UC13 — Step 2: Centralized validation helper.
-        /// Validates null operand, same measurement category, finite value, optional target unit.
-        /// Called by ALL arithmetic operations — validation logic defined ONCE.
-        /// </summary>
+        // UC13 - Step 2: i moved all validation into one place
+        // every arithmetic method calls this first so i don't repeat the same checks
         private void ValidateArithmeticOperands(Quantity<T> other, T targetUnit, bool targetUnitRequired)
         {
             if (other == null)
                 throw new ArgumentNullException(nameof(other), "Operand cannot be null");
 
+            // you can't add LengthUnit and WeightUnit — different types
             if (_unit.GetType() != other._unit.GetType())
                 throw new ArgumentException(
                     $"Cannot operate on different measurement categories: " +
@@ -68,16 +71,16 @@ namespace QuantityMeasurementApp.Core.Models
                 throw new ArgumentNullException(nameof(targetUnit), "Target unit cannot be null");
         }
 
-        /// <summary>
-        /// UC13 — Step 3: Core arithmetic helper.
-        /// UC14 — Calls this.unit.ValidateOperationSupport(operation.ToString()) FIRST.
-        ///         TemperatureUnit throws InvalidOperationException before any arithmetic runs.
-        ///         LengthUnit, WeightUnit, VolumeUnit inherit no-op default — unaffected.
-        /// Converts both operands to base unit, dispatches operation, returns raw base-unit result.
-        /// </summary>
+        // UC13 - Step 3: this is the core arithmetic helper
+        // both operands are converted to base unit first, then operation is applied
+        // result is returned as raw base unit value — caller converts it back
+
+        // UC14 - ValidateOperationSupport is called first
+        // for temperature this throws InvalidOperationException immediately
+        // for other units it's a no-op and everything continues normally
         private double PerformBaseArithmetic(Quantity<T> other, ArithmeticOperation operation)
         {
-            // UC14 — validate operation support before any arithmetic
+            // UC14 - this call stops temperature arithmetic before any math happens
             _unit.ValidateOperationSupport(operation.ToString());
 
             double thisBase = ToBaseValue();
@@ -98,14 +101,10 @@ namespace QuantityMeasurementApp.Core.Models
             }
         }
 
-        /// <summary>
-        /// Converts this quantity to the specified target unit.
-        /// UC14 — Works correctly for temperature without special-casing:
-        ///         ConvertToBaseUnit() applies the stored _toCelsius lambda.
-        ///         targetUnit.ConvertFromBaseUnit() applies the stored _fromCelsius lambda on target.
-        ///         Example: 100°C to Fahrenheit: toCelsius(100) = 100, fromFahrenheit(100) = 212.
-        /// </summary>
-        public Quantity<T> ConvertTo(T targetUnit)
+        // converts this quantity to a different unit
+        // UC14 - this works for temperature too because the lambda handles non-linear formula
+        // no special case needed — ConvertToBaseUnit and ConvertFromBaseUnit do the right thing
+        internal Quantity<T> ConvertTo(T targetUnit)
         {
             if (targetUnit == null)
                 throw new ArgumentNullException(nameof(targetUnit));
@@ -115,8 +114,8 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(converted, 5), targetUnit);
         }
 
-        /// <summary>UC13 — Step 4: Implicit target unit (first operand's unit).</summary>
-        public Quantity<T> Add(Quantity<T> other)
+        // UC13 - Step 4: Add with implicit target unit (result is in first operand's unit)
+        internal Quantity<T> Add(Quantity<T> other)
         {
             ValidateArithmeticOperands(other, _unit, false);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
@@ -124,8 +123,8 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), _unit);
         }
 
-        /// <summary>UC13 — Step 4: Explicit target unit.</summary>
-        public Quantity<T> Add(Quantity<T> other, T targetUnit)
+        // UC13 - Step 4: Add with explicit target unit
+        internal Quantity<T> Add(Quantity<T> other, T targetUnit)
         {
             ValidateArithmeticOperands(other, targetUnit, true);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
@@ -133,8 +132,8 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), targetUnit);
         }
 
-        /// <summary>UC13 — Step 4: Implicit target unit (first operand's unit).</summary>
-        public Quantity<T> Subtract(Quantity<T> other)
+        // UC13 - Step 4: Subtract with implicit target unit
+        internal Quantity<T> Subtract(Quantity<T> other)
         {
             ValidateArithmeticOperands(other, _unit, false);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
@@ -142,8 +141,8 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), _unit);
         }
 
-        /// <summary>UC13 — Step 4: Explicit target unit.</summary>
-        public Quantity<T> Subtract(Quantity<T> other, T targetUnit)
+        // UC13 - Step 4: Subtract with explicit target unit
+        internal Quantity<T> Subtract(Quantity<T> other, T targetUnit)
         {
             ValidateArithmeticOperands(other, targetUnit, true);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
@@ -151,13 +150,15 @@ namespace QuantityMeasurementApp.Core.Models
             return new Quantity<T>(Math.Round(result, 5), targetUnit);
         }
 
-        /// <summary>UC13 — Step 4: Returns dimensionless scalar.</summary>
-        public double Divide(Quantity<T> other)
+        // UC13 - Step 4: Divide returns a dimensionless scalar — no unit on the result
+        internal double Divide(Quantity<T> other)
         {
             ValidateArithmeticOperands(other, default, false);
             return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
         }
 
+        // compared by converting both to base unit and checking difference is within epsilon
+        // using 0.0001 as tolerance to handle floating point precision issues
         public override bool Equals(object? obj)
         {
             if (this == obj) return true;
@@ -169,5 +170,8 @@ namespace QuantityMeasurementApp.Core.Models
         public override int GetHashCode() => ToBaseValue().GetHashCode();
 
         public override string ToString() => $"{_value} {_unit.GetUnitName()}";
+
+        internal double GetValue() => _value;
+        internal T GetUnit() => _unit;
     }
 }

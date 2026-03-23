@@ -1,5 +1,8 @@
-using QuantityMeasurementApp.Core.Enums;
-using QuantityMeasurementApp.Core.Models;
+using QuantityMeasurementApp.Models.Enums;
+using QuantityMeasurementApp.Models.Interfaces;
+using QuantityMeasurementApp.Models.Exceptions;
+using QuantityMeasurementApp.Business.Helpers;
+using QuantityMeasurementApp.Business.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
@@ -17,8 +20,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoYardValues_WhenBothAreEqual_ShouldReturnTrue()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength secondValue = new QuantityLength(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
             Assert.AreEqual(firstValue, secondValue);
         }
 
@@ -30,8 +33,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoYardValues_WhenBothAreDifferent_ShouldReturnFalse()
         {
-            QuantityLength firstValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength secondValue = new QuantityLength(2.0, LengthUnit.Yard);
+            Quantity<LengthUnit> firstValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> secondValue = new Quantity<LengthUnit>(2.0, LengthUnit.Yard);
             Assert.IsFalse(firstValue.Equals(secondValue));
         }
 
@@ -43,8 +46,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneYardAndThreeFeet_WhenCompared_ShouldReturnTrue()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength feetValue = new QuantityLength(3.0, LengthUnit.Feet);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(3.0, LengthUnit.Feet);
             Assert.AreEqual(yardValue, feetValue);
         }
 
@@ -56,8 +59,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenThreeFeetAndOneYard_WhenCompared_ShouldReturnTrue()
         {
-            QuantityLength feetValue = new QuantityLength(3.0, LengthUnit.Feet);
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(3.0, LengthUnit.Feet);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
             Assert.AreEqual(feetValue, yardValue);
         }
 
@@ -69,8 +72,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneYardAndThirtySixInches_WhenCompared_ShouldReturnTrue()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength inchValue = new QuantityLength(36.0, LengthUnit.Inch);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(36.0, LengthUnit.Inch);
             Assert.AreEqual(yardValue, inchValue);
         }
 
@@ -82,8 +85,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenThirtySixInchesAndOneYard_WhenCompared_ShouldReturnTrue()
         {
-            QuantityLength inchValue = new QuantityLength(36.0, LengthUnit.Inch);
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(36.0, LengthUnit.Inch);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
             Assert.AreEqual(inchValue, yardValue);
         }
 
@@ -95,8 +98,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneYardAndTwoFeet_WhenCompared_ShouldReturnFalse()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength feetValue = new QuantityLength(2.0, LengthUnit.Feet);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
             Assert.IsFalse(yardValue.Equals(feetValue));
         }
 
@@ -108,8 +111,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneCentimeterAndEquivalentInches_WhenCompared_ShouldReturnTrue()
         {
-            QuantityLength cmValue = new QuantityLength(1.0, LengthUnit.Centimeter);
-            QuantityLength inchValue = new QuantityLength(0.393701, LengthUnit.Inch);
+            Quantity<LengthUnit> cmValue = new Quantity<LengthUnit>(1.0, LengthUnit.Centimeter);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(0.393701, LengthUnit.Inch);
             Assert.AreEqual(cmValue, inchValue);
         }
 
@@ -121,8 +124,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenOneCentimeterAndOneFeet_WhenCompared_ShouldReturnFalse()
         {
-            QuantityLength cmValue = new QuantityLength(1.0, LengthUnit.Centimeter);
-            QuantityLength feetValue = new QuantityLength(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> cmValue = new Quantity<LengthUnit>(1.0, LengthUnit.Centimeter);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
             Assert.IsFalse(cmValue.Equals(feetValue));
         }
 
@@ -135,9 +138,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenYardFeetInches_WhenTransitiveCheck_ShouldReturnTrue()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength feetValue = new QuantityLength(3.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(36.0, LengthUnit.Inch);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(3.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(36.0, LengthUnit.Inch);
             Assert.AreEqual(yardValue, feetValue);
             Assert.AreEqual(feetValue, inchValue);
             Assert.AreEqual(yardValue, inchValue);
@@ -152,7 +155,7 @@ namespace QuantityMeasurementApp.Tests
         public void GivenYardValue_WhenUnitIsInvalid_ShouldThrowException()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                    new QuantityLength(1.0, null));
+                    new Quantity<LengthUnit>(1.0, null));
         }
 
         /// <summary>
@@ -163,7 +166,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenYardValue_WhenComparedWithSameReference_ShouldReturnTrue()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
             Assert.AreEqual(yardValue, yardValue);
         }
 
@@ -175,7 +178,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenYardValue_WhenComparedWithNull_ShouldReturnFalse()
         {
-            QuantityLength yardValue = new QuantityLength(1.0, LengthUnit.Yard);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(1.0, LengthUnit.Yard);
             Assert.IsFalse(yardValue.Equals(null));
         }
 
@@ -188,7 +191,7 @@ namespace QuantityMeasurementApp.Tests
         public void GivenCentimeterValue_WhenUnitIsInvalid_ShouldThrowException()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                    new QuantityLength(1.0, null));
+                    new Quantity<LengthUnit>(1.0, null));
         }
 
         /// <summary>
@@ -199,7 +202,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenCentimeterValue_WhenComparedWithSameReference_ShouldReturnTrue()
         {
-            QuantityLength cmValue = new QuantityLength(1.0, LengthUnit.Centimeter);
+            Quantity<LengthUnit> cmValue = new Quantity<LengthUnit>(1.0, LengthUnit.Centimeter);
             Assert.AreEqual(cmValue, cmValue);
         }
 
@@ -211,7 +214,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenCentimeterValue_WhenComparedWithNull_ShouldReturnFalse()
         {
-            QuantityLength cmValue = new QuantityLength(1.0, LengthUnit.Centimeter);
+            Quantity<LengthUnit> cmValue = new Quantity<LengthUnit>(1.0, LengthUnit.Centimeter);
             Assert.IsFalse(cmValue.Equals(null));
         }
 
@@ -223,9 +226,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void GivenTwoYards_WhenComparedWithEquivalents_ShouldReturnTrue()
         {
-            QuantityLength yardValue = new QuantityLength(2.0, LengthUnit.Yard);
-            QuantityLength feetValue = new QuantityLength(6.0, LengthUnit.Feet);
-            QuantityLength inchValue = new QuantityLength(72.0, LengthUnit.Inch);
+            Quantity<LengthUnit> yardValue = new Quantity<LengthUnit>(2.0, LengthUnit.Yard);
+            Quantity<LengthUnit> feetValue = new Quantity<LengthUnit>(6.0, LengthUnit.Feet);
+            Quantity<LengthUnit> inchValue = new Quantity<LengthUnit>(72.0, LengthUnit.Inch);
             Assert.AreEqual(yardValue, feetValue);
             Assert.AreEqual(yardValue, inchValue);
         }
