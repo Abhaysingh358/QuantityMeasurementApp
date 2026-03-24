@@ -2,11 +2,11 @@ using QuantityMeasurementApp.Models.DTO;
 
 namespace QuantityMeasurementApp.Models.Entities
 {
-    // UC15 - created this entity class to store the history of every operation
+    // UC15 - created this entity class to store history of every operation
     // right now we are not saving it anywhere because repo layer is not implemented yet
     // but the service layer creates this entity after every operation
     // when repo layer comes in future, we just pass this entity to repo.Save()
-    // and nothing else will change — that's the whole point of designing it now
+    // and nothing else will change — that's whole point of designing it now
 
     // i made multiple constructors because different operations have different results
     // convert has single operand, add/subtract has two operands with quantity result
@@ -16,6 +16,7 @@ namespace QuantityMeasurementApp.Models.Entities
 
     // i didn't make fields final/readonly even though it should be immutable
     // because if we serialize this in future, serialization doesn't work with all readonly fields
+
     public class QuantityMeasurementEntity
     {
         public QuantityDTO Operand1 { get; }
@@ -70,7 +71,7 @@ namespace QuantityMeasurementApp.Models.Entities
         }
 
         // for error cases — when something throws an exception
-        // we store the error message so it can be logged or shown to user later
+        // we store error message so it can be logged or shown to user later
         public QuantityMeasurementEntity(QuantityDTO operand1, QuantityDTO operand2, string operation, string errorMessage, bool isError)
         {
             Operand1 = operand1;

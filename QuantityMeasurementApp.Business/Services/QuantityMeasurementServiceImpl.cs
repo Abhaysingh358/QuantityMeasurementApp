@@ -33,7 +33,7 @@ namespace QuantityMeasurementApp.Business.Services
 
             _repository = repository;
         }
-        
+
 
         // COMPARE
 
@@ -56,7 +56,16 @@ namespace QuantityMeasurementApp.Business.Services
                 double base1 = unit1.ConvertToBaseUnit(dto1.Value);
                 double base2 = unit2.ConvertToBaseUnit(dto2.Value);
 
-                return Math.Abs(base1 - base2) < 0.0001;
+                bool result = Math.Abs(base1 - base2) < 0.0001;
+
+                // UC16 - save every operation to the database
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Compare", result));
+
+                return result;
+            }
+            catch (QuantityMeasurementException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -64,7 +73,7 @@ namespace QuantityMeasurementApp.Business.Services
             }
         }
 
-        // CONVERT 
+        // CONVERT
 
         public QuantityDTO Convert(QuantityDTO dto, string targetUnit)
         {
@@ -83,7 +92,12 @@ namespace QuantityMeasurementApp.Business.Services
                 double baseValue = sourceUnit.ConvertToBaseUnit(dto.Value);
                 double converted = Math.Round(targetUnitInstance.ConvertFromBaseUnit(baseValue), 5);
 
-                return new QuantityDTO(converted, targetUnit, dto.MeasurementType);
+                QuantityDTO result = new QuantityDTO(converted, targetUnit, dto.MeasurementType);
+
+                // UC16 - save every operation to the database
+                _repository.Save(new QuantityMeasurementEntity(dto, "Convert", result));
+
+                return result;
             }
             catch (QuantityMeasurementException)
             {
@@ -116,9 +130,15 @@ namespace QuantityMeasurementApp.Business.Services
                 double baseResult = base1 + base2;
 
                 // convert result back to first operand's unit
-                double result = Math.Round(unit1.ConvertFromBaseUnit(baseResult), 5);
+                QuantityDTO result = new QuantityDTO(
+                    Math.Round(unit1.ConvertFromBaseUnit(baseResult), 5),
+                    dto1.Unit,
+                    dto1.MeasurementType);
 
-                return new QuantityDTO(result, dto1.Unit, dto1.MeasurementType);
+                // UC16 - save every operation to the database
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Add", result));
+
+                return result;
             }
             catch (InvalidOperationException ex)
             {
@@ -135,7 +155,7 @@ namespace QuantityMeasurementApp.Business.Services
             }
         }
 
-        // SUBTRACT 
+        // SUBTRACT
 
         public QuantityDTO Subtract(QuantityDTO dto1, QuantityDTO dto2)
         {
@@ -154,9 +174,17 @@ namespace QuantityMeasurementApp.Business.Services
                 double base1 = unit1.ConvertToBaseUnit(dto1.Value);
                 double base2 = unit2.ConvertToBaseUnit(dto2.Value);
                 double baseResult = base1 - base2;
-                double result = Math.Round(unit1.ConvertFromBaseUnit(baseResult), 5);
 
-                return new QuantityDTO(result, dto1.Unit, dto1.MeasurementType);
+                // convert result back to first operand's unit
+                QuantityDTO result = new QuantityDTO(
+                    Math.Round(unit1.ConvertFromBaseUnit(baseResult), 5),
+                    dto1.Unit,
+                    dto1.MeasurementType);
+
+                // UC16 - save every operation to the database
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Subtract", result));
+
+                return result;
             }
             catch (InvalidOperationException ex)
             {
@@ -195,7 +223,12 @@ namespace QuantityMeasurementApp.Business.Services
                     throw new QuantityMeasurementException("Cannot divide by zero quantity");
 
                 // result has no unit — just a ratio
-                return base1 / base2;
+                double result = base1 / base2;
+
+                // UC16 - save every operation to the database
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Divide", result));
+
+                return result;
             }
             catch (InvalidOperationException ex)
             {
@@ -226,9 +259,9 @@ namespace QuantityMeasurementApp.Business.Services
         {
             switch (measurementType.ToLower())
             {
-                case "length": return LengthUnit.GetByName(unitName);
-                case "weight": return WeightUnit.GetByName(unitName);
-                case "volume": return VolumeUnit.GetByName(unitName);
+                case "length":      return LengthUnit.GetByName(unitName);
+                case "weight":      return WeightUnit.GetByName(unitName);
+                case "volume":      return VolumeUnit.GetByName(unitName);
                 case "temperature": return TemperatureUnit.GetByName(unitName);
                 default:
                     throw new QuantityMeasurementException($"Unknown measurement type: {measurementType}");
@@ -250,7 +283,5 @@ namespace QuantityMeasurementApp.Business.Services
                     $"Cannot {operation} across different categories: " +
                     $"{dto1.MeasurementType} and {dto2.MeasurementType}");
         }
-
-        
     }
 }

@@ -2,7 +2,7 @@ using QuantityMeasurementApp.Business.Interfaces;
 using QuantityMeasurementApp.Models.DTO;
 using QuantityMeasurementApp.Models.Exceptions;
 
-namespace QuantityMeasurementApp.Application
+namespace QuantityMeasurementApp.Application.Services
 {
     internal class Menu
     {

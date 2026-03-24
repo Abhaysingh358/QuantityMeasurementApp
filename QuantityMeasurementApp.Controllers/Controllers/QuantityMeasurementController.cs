@@ -1,7 +1,7 @@
 using QuantityMeasurementApp.Models.DTO;
 using QuantityMeasurementApp.Business.Interfaces;
 
-namespace QuantityMeasurementApp.Controllers
+namespace QuantityMeasurementApp.Controllers.Controllers
 {
     public class QuantityMeasurementController
     {

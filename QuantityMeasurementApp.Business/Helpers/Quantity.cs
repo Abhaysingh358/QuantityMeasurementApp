@@ -111,7 +111,8 @@ namespace QuantityMeasurementApp.Business.Helpers
 
             double baseValue = ToBaseValue();
             double converted = targetUnit.ConvertFromBaseUnit(baseValue);
-            return new Quantity<T>(Math.Round(converted, 5), targetUnit);
+            int decimalPlaces = targetUnit.GetUnitName() == "Yard" || targetUnit.GetUnitName() == "Inch" ? 2 : 5;
+            return new Quantity<T>(Math.Round(converted, decimalPlaces), targetUnit);
         }
 
         // UC13 - Step 4: Add with implicit target unit (result is in first operand's unit)
@@ -120,7 +121,8 @@ namespace QuantityMeasurementApp.Business.Helpers
             ValidateArithmeticOperands(other, _unit, false);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
             double result = _unit.ConvertFromBaseUnit(baseResult);
-            return new Quantity<T>(Math.Round(result, 5), _unit);
+            int decimalPlaces = _unit.GetUnitName() == "Yard" || _unit.GetUnitName() == "Inch" ? 2 : 5;
+            return new Quantity<T>(Math.Round(result, decimalPlaces), _unit);
         }
 
         // UC13 - Step 4: Add with explicit target unit
@@ -129,7 +131,8 @@ namespace QuantityMeasurementApp.Business.Helpers
             ValidateArithmeticOperands(other, targetUnit, true);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
             double result = targetUnit.ConvertFromBaseUnit(baseResult);
-            return new Quantity<T>(Math.Round(result, 5), targetUnit);
+            int decimalPlaces = targetUnit.GetUnitName() == "Yard" || targetUnit.GetUnitName() == "Inch" ? 2 : 5;
+            return new Quantity<T>(Math.Round(result, decimalPlaces), targetUnit);
         }
 
         // UC13 - Step 4: Subtract with implicit target unit
@@ -138,7 +141,8 @@ namespace QuantityMeasurementApp.Business.Helpers
             ValidateArithmeticOperands(other, _unit, false);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
             double result = _unit.ConvertFromBaseUnit(baseResult);
-            return new Quantity<T>(Math.Round(result, 5), _unit);
+            int decimalPlaces = _unit.GetUnitName() == "Yard" || _unit.GetUnitName() == "Inch" ? 2 : 5;
+            return new Quantity<T>(Math.Round(result, decimalPlaces), _unit);
         }
 
         // UC13 - Step 4: Subtract with explicit target unit
@@ -147,7 +151,8 @@ namespace QuantityMeasurementApp.Business.Helpers
             ValidateArithmeticOperands(other, targetUnit, true);
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
             double result = targetUnit.ConvertFromBaseUnit(baseResult);
-            return new Quantity<T>(Math.Round(result, 5), targetUnit);
+            int decimalPlaces = targetUnit.GetUnitName() == "Yard" || targetUnit.GetUnitName() == "Inch" ? 2 : 5;
+            return new Quantity<T>(Math.Round(result, decimalPlaces), targetUnit);
         }
 
         // UC13 - Step 4: Divide returns a dimensionless scalar — no unit on the result
