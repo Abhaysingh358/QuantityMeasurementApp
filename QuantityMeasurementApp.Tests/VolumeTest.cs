@@ -14,7 +14,7 @@ namespace QuantityMeasurementApp.Tests
     {
         private const double Epsilon = 0.0001;
 
-        // ─── EQUALITY TESTS ───────────────────────────────────────────────────
+        //  EQUALITY TESTS 
 
         /// <summary>
         /// testEquality_LitreToLitre_SameValue() –
@@ -208,7 +208,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(litreValue, mlValue);
         }
 
-        // ─── VOLUME UNIT METHOD TESTS ─────────────────────────────────────────
+        //  VOLUME UNIT METHOD TESTS 
 
         /// <summary>
         /// testVolumeUnitEnum_LitreConstant() –
@@ -309,7 +309,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(1.0, result, Epsilon);
         }
 
-        // ─── CONVERSION TESTS ─────────────────────────────────────────────────
+        //  CONVERSION TESTS 
 
         /// <summary>
         /// testConversion_LitreToMillilitre() –
@@ -428,7 +428,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(original, roundTrip);
         }
 
-        // ─── ADDITION TESTS ───────────────────────────────────────────────────
+        // ADDITION TESTS 
 
         /// <summary>
         /// testAddition_SameUnit_LitrePlusLitre() –
@@ -612,7 +612,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(expected, result);
         }
 
-        // ─── CONSTRUCTOR VALIDATION TESTS ────────────────────────────────────
+        // CONSTRUCTOR VALIDATION TESTS 
 
         /// <summary>
         /// Quantity(NaN, LITRE) should throw ArgumentException.
@@ -634,7 +634,7 @@ namespace QuantityMeasurementApp.Tests
                 new Quantity<VolumeUnit>(double.PositiveInfinity, VolumeUnit.Litre));
         }
 
-        // ─── BACKWARD COMPATIBILITY & SCALABILITY TESTS ──────────────────────
+        // BACKWARD COMPATIBILITY & SCALABILITY TESTS 
 
         /// <summary>
         /// testBackwardCompatibility_AllUC1Through10Tests() –

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace QuantityMeasurementApp.Models.DTO
 {
     // UC15 - i created this DTO class to pass data between layers
@@ -11,10 +12,13 @@ namespace QuantityMeasurementApp.Models.DTO
     // this is a POCO — no methods, no logic, just data
     public class QuantityDTO
     {
+        [Required]
         public double Value { get;}
+        [Required]
         public string Unit { get;}
 
         // tells which category this is — "Length", "Weight", "Volume" or "Temperature"
+        [RegularExpression("Length|Weight|Volume|Temperature")]
         public string MeasurementType { get; }
 
         public QuantityDTO(double value, string unit, string measurementType)

@@ -220,7 +220,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(expected, result);
         }
 
-        // ─── SUBTRACTION — ERROR HANDLING ────────────────────────────────────
+        //  SUBTRACTION — ERROR HANDLING 
 
         /// <summary>
         /// testSubtraction_NullOperand() –
@@ -259,7 +259,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.IsNotNull(feetValue.Subtract(fakeWeight));
         }
 
-        // ─── SUBTRACTION — ALL CATEGORIES ────────────────────────────────────
+        //  SUBTRACTION — ALL CATEGORIES 
 
         /// <summary>
         /// testSubtraction_AllMeasurementCategories() –
@@ -302,7 +302,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(expected, result);
         }
 
-        // ─── DIVISION — SAME UNIT ─────────────────────────────────────────────
+        //  DIVISION — SAME UNIT 
 
         /// <summary>
         /// testDivision_SameUnit_FeetDividedByFeet() –
@@ -330,7 +330,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(2.0, result, Epsilon);
         }
 
-        // ─── DIVISION — CROSS UNIT ────────────────────────────────────────────
+        //  DIVISION — CROSS UNIT 
 
         /// <summary>
         /// testDivision_CrossUnit_FeetDividedByInches() –
@@ -358,7 +358,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(1.0, result, Epsilon);
         }
 
-        // ─── DIVISION — RATIO CASES ───────────────────────────────────────────
+        // DIVISION — RATIO CASES 
 
         /// <summary>
         /// testDivision_RatioGreaterThanOne() –
@@ -443,7 +443,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(1e-6, result, 1e-10);
         }
 
-        // ─── DIVISION — ERROR HANDLING ────────────────────────────────────────
+        //  DIVISION — ERROR HANDLING 
 
         /// <summary>
         /// testDivision_ByZero() –
@@ -468,7 +468,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.Throws<ArgumentNullException>(() => feetValue.Divide(null));
         }
 
-        // ─── DIVISION — ALL CATEGORIES ────────────────────────────────────────
+        //  DIVISION — ALL CATEGORIES 
 
         /// <summary>
         /// testDivision_AllMeasurementCategories() –
@@ -514,7 +514,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreNotEqual(leftAssoc, rightAssoc, Epsilon);
         }
 
-        // ─── INTEGRATION TESTS ────────────────────────────────────────────────
+        //  INTEGRATION TESTS 
 
         /// <summary>
         /// testSubtractionAndDivision_Integration() –
@@ -545,7 +545,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(a, result);
         }
 
-        // ─── IMMUTABILITY TESTS ───────────────────────────────────────────────
+        //  IMMUTABILITY TESTS 
 
         /// <summary>
         /// testSubtraction_Immutability() –
@@ -579,7 +579,7 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(5.0, ratio, Epsilon);
         }
 
-        // ─── PRECISION TESTS ──────────────────────────────────────────────────
+        //  PRECISION TESTS 
 
         /// <summary>
         /// testSubtraction_PrecisionAndRounding() –
