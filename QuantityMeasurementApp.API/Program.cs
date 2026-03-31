@@ -1,14 +1,22 @@
 using Microsoft.EntityFrameworkCore;
-
 using QuantityMeasurementApp.Business.Interfaces;
 using QuantityMeasurementApp.Business.Services;
-
 using QuantityMeasurementApp.Repositories.Implementations;
-
 using QuantityMeasurementApp.Repositories.Context;
-
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog Configuration
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services
 builder.Services.AddControllers();
@@ -35,6 +43,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Global Exception Middleware
+app.UseMiddleware<QuantityMeasurementApp.API.Middlewares.GlobalExceptionHandler>();
+
+// Request Logging
+app.UseSerilogRequestLogging();
 
 app.UseAuthorization();
 
