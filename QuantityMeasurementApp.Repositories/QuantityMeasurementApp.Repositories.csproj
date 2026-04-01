@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QuantityMeasurementApp.Models\QuantityMeasurementApp.Models.csproj" />
-    <ProjectReference Include="..\QuantityMeasurementApp.Business\QuantityMeasurementApp.Business.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

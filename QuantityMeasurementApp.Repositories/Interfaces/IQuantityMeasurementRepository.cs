@@ -1,6 +1,6 @@
 using QuantityMeasurementApp.Models.Entities;
 
-namespace QuantityMeasurementApp.Business.Interfaces
+namespace QuantityMeasurementApp.Repositories.Interfaces
 {
     // UC15 - i defined this interface now even though repo layer is not implemented yet
     // the reason is — service constructor takes this as parameter (dependency injection)

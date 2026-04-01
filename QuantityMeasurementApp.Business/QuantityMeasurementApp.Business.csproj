@@ -2,6 +2,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QuantityMeasurementApp.Models\QuantityMeasurementApp.Models.csproj" />
+    <ProjectReference Include="..\QuantityMeasurementApp.Repositories\QuantityMeasurementApp.Repositories.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth" Version="1.73.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
   </ItemGroup>
 
   <PropertyGroup>

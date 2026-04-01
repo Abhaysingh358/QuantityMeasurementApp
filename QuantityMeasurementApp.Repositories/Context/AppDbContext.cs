@@ -23,6 +23,9 @@ namespace QuantityMeasurementApp.Repositories.Context
         // EF Core will create / migrate the table to match MeasurementHistoryRecord.
         public DbSet<MeasurementHistoryRecord> MeasurementHistory { get; set; }
 
+        // below users are using for authorisation
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<MeasurementHistoryRecord>(entity =>

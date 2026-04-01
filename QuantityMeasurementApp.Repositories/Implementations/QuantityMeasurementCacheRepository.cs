@@ -1,5 +1,5 @@
 using QuantityMeasurementApp.Models.Entities;
-using QuantityMeasurementApp.Business.Interfaces;
+using QuantityMeasurementApp.Repositories.Interfaces;
 using System.Linq;
 
 namespace QuantityMeasurementApp.Repositories.Implementations
