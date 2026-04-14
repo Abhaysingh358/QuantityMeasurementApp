@@ -1,10 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using QuantityMeasurementApp.Models.Entities; 
-using System.Reflection.Emit;
 
 namespace QuantityMeasurementApp.Repositories.Context
 {
-
     // AppDbContext is the bridge between your C# code and SQL Server.
     // EF Core uses this class to:
     //   1. Know which tables exist  (DbSet<T> properties)
@@ -23,20 +21,20 @@ namespace QuantityMeasurementApp.Repositories.Context
         // EF Core will create / migrate the table to match MeasurementHistoryRecord.
         public DbSet<MeasurementHistoryRecord> MeasurementHistory { get; set; }
 
-        // below users are using for authorisation
+        // Users table — used for authentication
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // MeasurementHistory table 
             modelBuilder.Entity<MeasurementHistoryRecord>(entity =>
             {
-                // Table name in SQL Server
                 entity.ToTable("MeasurementHistory");
 
-                // Primary key (EF Core detects "Id" by convention, but being explicit is cleaner)
+                // Primary key
                 entity.HasKey(e => e.Id);
 
-                // Required string columns — set max length to avoid NVARCHAR(MAX) defaults
+                // Required string columns — explicit max length avoids NVARCHAR(MAX) defaults
                 entity.Property(e => e.Operation)
                       .IsRequired()
                       .HasMaxLength(50);
@@ -60,9 +58,32 @@ namespace QuantityMeasurementApp.Repositories.Context
                 entity.Property(e => e.ResultQuantityMeasurementType).HasMaxLength(50);
                 entity.Property(e => e.ErrorMessage).HasMaxLength(500);
 
-                // CreatedAt default value set by SQL Server when a row is inserted
+                // CreatedAt — SQL Server sets this automatically on INSERT
                 entity.Property(e => e.CreatedAt)
                       .HasDefaultValueSql("GETDATE()");
+
+                // FK — links each history record to a user
+                // SetNull means if the user is deleted, history stays but UserId becomes null
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            //  Users table 
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users");
+                entity.HasKey(u => u.Id);
+
+                entity.Property(u => u.Email)
+                      .IsRequired()
+                      .HasMaxLength(256);
+
+                entity.HasIndex(u => u.Email).IsUnique();   // no duplicate emails
+
+                entity.Property(u => u.PasswordHash).HasMaxLength(512);
+                entity.Property(u => u.GoogleId).HasMaxLength(128);
             });
         }
     }

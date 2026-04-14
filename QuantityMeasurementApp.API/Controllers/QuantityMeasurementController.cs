@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using QuantityMeasurementApp.Models.DTO;
 using QuantityMeasurementApp.Business.Interfaces;
 
@@ -6,6 +8,7 @@ namespace QuantityMeasurementApp.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class QuantityMeasurementController : ControllerBase
     {
         private readonly IQuantityMeasurementService _service;
@@ -16,7 +19,7 @@ namespace QuantityMeasurementApp.API.Controllers
             ILogger<QuantityMeasurementController> logger)
         {
             _service = service;
-            _logger = logger;
+            _logger  = logger;
         }
 
         // Compare
@@ -31,7 +34,7 @@ namespace QuantityMeasurementApp.API.Controllers
                 return BadRequest("Input quantities cannot be null.");
             }
 
-            var result = _service.Compare(input.First, input.Second);
+            var result = _service.Compare(input.First, input.Second, GetUserId());
 
             return Ok(result);
         }
@@ -48,7 +51,7 @@ namespace QuantityMeasurementApp.API.Controllers
                 return BadRequest("Invalid request.");
             }
 
-            var result = _service.Convert(request.Input, request.TargetUnit);
+            var result = _service.Convert(request.Input, request.TargetUnit, GetUserId());
 
             return Ok(result);
         }
@@ -65,7 +68,7 @@ namespace QuantityMeasurementApp.API.Controllers
                 return BadRequest("Invalid input.");
             }
 
-            var result = _service.Add(input.First, input.Second);
+            var result = _service.Add(input.First, input.Second, GetUserId());
 
             return Ok(result);
         }
@@ -82,7 +85,7 @@ namespace QuantityMeasurementApp.API.Controllers
                 return BadRequest("Invalid input.");
             }
 
-            var result = _service.Subtract(input.First, input.Second);
+            var result = _service.Subtract(input.First, input.Second, GetUserId());
 
             return Ok(result);
         }
@@ -99,9 +102,18 @@ namespace QuantityMeasurementApp.API.Controllers
                 return BadRequest("Invalid input.");
             }
 
-            var result = _service.Divide(input.First, input.Second);
+            var result = _service.Divide(input.First, input.Second, GetUserId());
 
             return Ok(result);
+        }
+
+        // reads userId from JWT — set by AuthService.GenerateJwtToken as ClaimTypes.NameIdentifier
+        private int? GetUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(claim, out int id))
+                return id;
+            return null;
         }
     }
 }

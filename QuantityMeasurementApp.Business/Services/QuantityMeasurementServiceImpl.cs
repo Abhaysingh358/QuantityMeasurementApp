@@ -8,25 +8,10 @@ using QuantityMeasurementApp.Models.Interfaces;
 
 namespace QuantityMeasurementApp.Business.Services
 {
-    // UC15 - this is where all the business logic lives now
-    // earlier Quantity<T> class was doing everything — holding value, unit and doing operations
-    // now the data part is in QuantityDTO and QuantityModel, and logic is here
-    // this makes it easier to test the logic without worrying about how data is stored
-
-    // the service receives QuantityDTO from console or future API
-    // it converts the DTO strings to actual unit instances using GetByName()
-    // does the operation, wraps result back in QuantityDTO and returns
-
-    // IQuantityMeasurementRepository is injected via constructor
-    // right now we pass NoOp which does nothing
-    // when real repo comes later, we just pass that — this class doesn't change
     public class QuantityMeasurementServiceImpl : IQuantityMeasurementService
     {
         private readonly IQuantityMeasurementRepository _repository;
 
-        // i receive the repository from outside instead of creating it here
-        // this is dependency injection — makes it easy to swap implementations
-        // also makes testing easier because we can pass a fake repo in tests
         public QuantityMeasurementServiceImpl(IQuantityMeasurementRepository repository)
         {
             if (repository == null)
@@ -35,32 +20,26 @@ namespace QuantityMeasurementApp.Business.Services
             _repository = repository;
         }
 
-
         // COMPARE
-
-        public bool Compare(QuantityDTO dto1, QuantityDTO dto2)
+        public bool Compare(QuantityDTO dto1, QuantityDTO dto2, int? userId = null)
         {
             ValidateNotNull(dto1, "First quantity");
             ValidateNotNull(dto2, "Second quantity");
 
             try
             {
-                // if categories are different, they can never be equal
-                // no point converting — just return false immediately
                 if (!string.Equals(dto1.MeasurementType, dto2.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     return false;
 
                 IMeasurable unit1 = ResolveUnit(dto1);
                 IMeasurable unit2 = ResolveUnit(dto2);
 
-                // convert both to base unit and compare with epsilon tolerance
                 double base1 = unit1.ConvertToBaseUnit(dto1.Value);
                 double base2 = unit2.ConvertToBaseUnit(dto2.Value);
 
                 bool result = Math.Abs(base1 - base2) < 0.0001;
 
-                // UC16 - save every operation to the database
-                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Compare", result));
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Compare", result), userId);
 
                 return result;
             }
@@ -75,8 +54,7 @@ namespace QuantityMeasurementApp.Business.Services
         }
 
         // CONVERT
-
-        public QuantityDTO Convert(QuantityDTO dto, string targetUnit)
+        public QuantityDTO Convert(QuantityDTO dto, string targetUnit, int? userId = null)
         {
             ValidateNotNull(dto, "Input quantity");
 
@@ -86,8 +64,6 @@ namespace QuantityMeasurementApp.Business.Services
             try
             {
                 IMeasurable sourceUnit = ResolveUnit(dto);
-
-                // resolve target unit using same category as source
                 IMeasurable targetUnitInstance = ResolveUnitByTypeAndName(dto.MeasurementType, targetUnit);
 
                 double baseValue = sourceUnit.ConvertToBaseUnit(dto.Value);
@@ -95,8 +71,7 @@ namespace QuantityMeasurementApp.Business.Services
 
                 QuantityDTO result = new QuantityDTO(converted, targetUnit, dto.MeasurementType);
 
-                // UC16 - save every operation to the database
-                _repository.Save(new QuantityMeasurementEntity(dto, "Convert", result));
+                _repository.Save(new QuantityMeasurementEntity(dto, "Convert", result), userId);
 
                 return result;
             }
@@ -111,8 +86,7 @@ namespace QuantityMeasurementApp.Business.Services
         }
 
         // ADD
-
-        public QuantityDTO Add(QuantityDTO dto1, QuantityDTO dto2)
+        public QuantityDTO Add(QuantityDTO dto1, QuantityDTO dto2, int? userId = null)
         {
             ValidateNotNull(dto1, "First quantity");
             ValidateNotNull(dto2, "Second quantity");
@@ -123,27 +97,23 @@ namespace QuantityMeasurementApp.Business.Services
                 IMeasurable unit1 = ResolveUnit(dto1);
                 IMeasurable unit2 = ResolveUnit(dto2);
 
-                // UC14 - this throws for temperature — temperature does not support arithmetic
                 unit1.ValidateOperationSupport("Add");
 
                 double base1 = unit1.ConvertToBaseUnit(dto1.Value);
                 double base2 = unit2.ConvertToBaseUnit(dto2.Value);
                 double baseResult = base1 + base2;
 
-                // convert result back to first operand's unit
                 QuantityDTO result = new QuantityDTO(
                     Math.Round(unit1.ConvertFromBaseUnit(baseResult), 5),
                     dto1.Unit,
                     dto1.MeasurementType);
 
-                // UC16 - save every operation to the database
-                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Add", result));
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Add", result), userId);
 
                 return result;
             }
             catch (InvalidOperationException ex)
             {
-                // temperature throws InvalidOperationException, we wrap it in our custom exception
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
             catch (QuantityMeasurementException)
@@ -157,8 +127,7 @@ namespace QuantityMeasurementApp.Business.Services
         }
 
         // SUBTRACT
-
-        public QuantityDTO Subtract(QuantityDTO dto1, QuantityDTO dto2)
+        public QuantityDTO Subtract(QuantityDTO dto1, QuantityDTO dto2, int? userId = null)
         {
             ValidateNotNull(dto1, "First quantity");
             ValidateNotNull(dto2, "Second quantity");
@@ -169,21 +138,18 @@ namespace QuantityMeasurementApp.Business.Services
                 IMeasurable unit1 = ResolveUnit(dto1);
                 IMeasurable unit2 = ResolveUnit(dto2);
 
-                // UC14 - blocks temperature arithmetic same as Add
                 unit1.ValidateOperationSupport("Subtract");
 
                 double base1 = unit1.ConvertToBaseUnit(dto1.Value);
                 double base2 = unit2.ConvertToBaseUnit(dto2.Value);
                 double baseResult = base1 - base2;
 
-                // convert result back to first operand's unit
                 QuantityDTO result = new QuantityDTO(
                     Math.Round(unit1.ConvertFromBaseUnit(baseResult), 5),
                     dto1.Unit,
                     dto1.MeasurementType);
 
-                // UC16 - save every operation to the database
-                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Subtract", result));
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Subtract", result), userId);
 
                 return result;
             }
@@ -202,8 +168,7 @@ namespace QuantityMeasurementApp.Business.Services
         }
 
         // DIVIDE
-
-        public double Divide(QuantityDTO dto1, QuantityDTO dto2)
+        public double Divide(QuantityDTO dto1, QuantityDTO dto2, int? userId = null)
         {
             ValidateNotNull(dto1, "First quantity");
             ValidateNotNull(dto2, "Second quantity");
@@ -214,7 +179,6 @@ namespace QuantityMeasurementApp.Business.Services
                 IMeasurable unit1 = ResolveUnit(dto1);
                 IMeasurable unit2 = ResolveUnit(dto2);
 
-                // UC14 - blocks temperature arithmetic same as Add and Subtract
                 unit1.ValidateOperationSupport("Divide");
 
                 double base1 = unit1.ConvertToBaseUnit(dto1.Value);
@@ -223,11 +187,9 @@ namespace QuantityMeasurementApp.Business.Services
                 if (base2 == 0)
                     throw new QuantityMeasurementException("Cannot divide by zero quantity");
 
-                // result has no unit — just a ratio
                 double result = base1 / base2;
 
-                // UC16 - save every operation to the database
-                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Divide", result));
+                _repository.Save(new QuantityMeasurementEntity(dto1, dto2, "Divide", result), userId);
 
                 return result;
             }
@@ -246,16 +208,11 @@ namespace QuantityMeasurementApp.Business.Services
         }
 
         // PRIVATE HELPERS
-
-        // takes a QuantityDTO and returns the actual unit instance
-        // example: dto with MeasurementType="Length" and Unit="Feet" → returns LengthUnit.Feet
         private IMeasurable ResolveUnit(QuantityDTO dto)
         {
             return ResolveUnitByTypeAndName(dto.MeasurementType, dto.Unit);
         }
 
-        // switches on category name and calls the right GetByName()
-        // this is the mapping between QuantityDTO strings and actual unit instances
         private IMeasurable ResolveUnitByTypeAndName(string measurementType, string unitName)
         {
             switch (measurementType.ToLower())
@@ -275,8 +232,6 @@ namespace QuantityMeasurementApp.Business.Services
                 throw new QuantityMeasurementException($"{name} cannot be null");
         }
 
-        // checks both DTOs belong to same category before any arithmetic
-        // you can't add Length + Weight — this stops that
         private void ValidateSameCategory(QuantityDTO dto1, QuantityDTO dto2, string operation)
         {
             if (!string.Equals(dto1.MeasurementType, dto2.MeasurementType, StringComparison.OrdinalIgnoreCase))

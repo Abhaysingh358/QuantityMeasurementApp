@@ -26,6 +26,17 @@ builder.Host.UseSerilog();
 // Add services
 builder.Services.AddControllers();
 
+// CORS — allow Live Server frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -104,6 +115,9 @@ app.UseMiddleware<QuantityMeasurementApp.API.Middlewares.GlobalExceptionHandler>
 
 // Request Logging
 app.UseSerilogRequestLogging();
+
+// CORS — must be before Authentication & Authorization
+app.UseCors("AllowFrontend");
 
 // order matters — Authentication must come before Authorization
 app.UseAuthentication();

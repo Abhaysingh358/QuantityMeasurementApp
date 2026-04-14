@@ -15,6 +15,10 @@ namespace QuantityMeasurementApp.Models.Entities
         // Primary key — EF Core auto-increments this (IDENTITY column in SQL Server)
         public int Id { get; set; }
 
+        // FK to Users table — null means record was saved without a logged-in user
+        public int? UserId { get; set; }
+        public User? User { get; set; }   // EF Core navigation property
+
         // Operation name: "Compare", "Convert", "Add", "Subtract", "Divide"
         public string Operation { get; set; } = string.Empty;
 

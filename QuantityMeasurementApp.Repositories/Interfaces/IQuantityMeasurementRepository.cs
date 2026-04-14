@@ -14,10 +14,14 @@ namespace QuantityMeasurementApp.Repositories.Interfaces
     public interface IQuantityMeasurementRepository
     {
         // saves a measurement record after every operation
-        void Save(QuantityMeasurementEntity entity);
+        // userId is optional — null means unauthenticated or anonymous call
+        void Save(QuantityMeasurementEntity entity, int? userId = null);
 
-        // returns all saved records — useful for history/audit
+        // returns all saved records — useful for admin/audit
         List<QuantityMeasurementEntity> GetAll();
+
+        // returns only records belonging to a specific user
+        List<QuantityMeasurementEntity> GetByUserId(int userId);
 
         // clears all records — mainly for testing
         void Clear();

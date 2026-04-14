@@ -24,19 +24,21 @@ namespace QuantityMeasurementApp.Repositories.Implementations
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // SAVE 
-        public void Save(QuantityMeasurementEntity entity)
+        // SAVE
+        // userId is optional — when called without login context, stays null
+        public void Save(QuantityMeasurementEntity entity, int? userId = null)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            var record = MapEntityToRecord(entity);
+            var record    = MapEntityToRecord(entity);
+            record.UserId = userId;   // links record to logged-in user, null if anonymous
 
             _context.MeasurementHistory.Add(record);
-            _context.SaveChanges();          // INSERT into SQL Server
+            _context.SaveChanges();   // INSERT into SQL Server
         }
 
-        //  GET ALL
+        // GET ALL — for admin/audit purposes, returns every user's records
         public List<QuantityMeasurementEntity> GetAll()
         {
             return _context.MeasurementHistory
@@ -47,7 +49,19 @@ namespace QuantityMeasurementApp.Repositories.Implementations
                            .ToList();
         }
 
-        //  CLEAR 
+        // GET BY USER — returns only records belonging to this user, newest first
+        public List<QuantityMeasurementEntity> GetByUserId(int userId)
+        {
+            return _context.MeasurementHistory
+                           .AsNoTracking()
+                           .Where(r => r.UserId == userId)
+                           .OrderByDescending(r => r.CreatedAt)
+                           .ToList()
+                           .Select(MapRecordToEntity)
+                           .ToList();
+        }
+
+        // CLEAR
         public void Clear()
         {
             _context.MeasurementHistory.ExecuteDelete();  // EF Core 7+ bulk delete, no SELECT first
@@ -60,10 +74,10 @@ namespace QuantityMeasurementApp.Repositories.Implementations
         {
             var record = new MeasurementHistoryRecord
             {
-                Operation  = entity.Operation ?? "Unknown",
-                IsError    = entity.IsError,
+                Operation    = entity.Operation ?? "Unknown",
+                IsError      = entity.IsError,
                 ErrorMessage = entity.ErrorMessage,
-                CreatedAt  = DateTime.Now,
+                CreatedAt    = DateTime.Now,
 
                 // Operand 1
                 Operand1Value           = entity.Operand1?.Value ?? 0,
@@ -100,14 +114,14 @@ namespace QuantityMeasurementApp.Repositories.Implementations
             }
             else
             {
-                record.ResultType = "Scalar";
+                record.ResultType   = "Scalar";
                 record.ResultScalar = entity.ResultScalar;
             }
 
             return record;
         }
 
-        // 
+        //
         // PRIVATE: flat DB record -> domain entity
         //
         private static QuantityMeasurementEntity MapRecordToEntity(MeasurementHistoryRecord record)
